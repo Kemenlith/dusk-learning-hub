@@ -1,0 +1,118 @@
+ss="key-point"><div class="kp-dot"></div><span>2-epoch maturity period (~4,320 blocks) before earning rewards</span></div>
+        </div>
+      </div>
+
+      <!-- Panel B: Separated Key Setup -->
+      <div id="panel-separated">
+        <!-- SVG: Separated Key Flow -->
+        <div class="diagram">
+          <svg viewBox="0 0 760 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Separated key setup: cold owner wallet separate from hot node wallet with staking flow">
+            <!-- Owner machine (cold) -->
+            <rect x="20" y="10" width="300" height="90" rx="10" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+            <text x="170" y="32" fill="#34d399" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🔒 Owner Machine (Cold)</text>
+            <text x="170" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">rusk-wallet create → note owner address</text>
+            <text x="170" y="68" fill="#34d399" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">Controls: unstake, withdraw, restake</text>
+            <text x="170" y="86" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Keep offline / hardware wallet</text>
+            <!-- Arrow -->
+            <rect x="340" y="35" width="80" height="30" rx="15" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+            <text x="380" y="55" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">separated</text>
+            <!-- Node machine (hot) -->
+            <rect x="440" y="10" width="300" height="90" rx="10" fill="rgba(239,68,68,0.05)" stroke="rgba(239,68,68,0.25)" stroke-width="1.5"/>
+            <text x="590" y="32" fill="#f87171" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🌐 Node Machine (Hot)</text>
+            <text x="590" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">rusk-wallet create → export consensus.keys</text>
+            <text x="590" y="68" fill="#f87171" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">Controls: block signing only</text>
+            <text x="590" y="86" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Node compromise = no fund loss</text>
+            <!-- Staking flow diagram -->
+            <rect x="80" y="120" width="600" height="85" rx="8" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.15)" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="380" y="138" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">How --owner staking works</text>
+            <!-- Step 1 -->
+            <rect x="100" y="150" width="135" height="40" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.25)" stroke-width="1"/>
+            <text x="167" y="167" fill="#34d399" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">1. Node wallet stakes</text>
+            <text x="167" y="182" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="8" text-anchor="middle">stake --amt --owner</text>
+            <path d="M235 170 L270 170" stroke="#8B5CF6" stroke-width="1.2" marker-end="url(#apsk)"/>
+            <!-- Step 2 -->
+            <rect x="270" y="150" width="135" height="40" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+            <text x="337" y="167" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">2. Chain records</text>
+            <text x="337" y="182" fill="#94a3b8" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">consensus → node, owner → you</text>
+            <path d="M405 170 L440 170" stroke="#8B5CF6" stroke-width="1.2" marker-end="url(#apsk)"/>
+            <!-- Step 3 -->
+            <rect x="440" y="150" width="155" height="40" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.25)" stroke-width="1"/>
+            <text x="517" y="167" fill="#34d399" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">3. Only owner can</text>
+            <text x="517" y="182" fill="#94a3b8" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">unstake / withdraw rewards</text>
+            <defs><marker id="apsk" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#8B5CF6"/></marker></defs>
+          </svg>
+        </div>
+
+        <div class="callout" style="background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.2); border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.25rem; font-size:0.82rem; line-height:1.65; color:var(--text-muted);">
+          <strong style="color:var(--purple-light)">How does --owner make this secure?</strong><br>
+          When you run <code>rusk-wallet stake --amt 1000 --owner &lt;owner-address&gt;</code> from the <em>node wallet</em>, you're writing an on-chain record: "this node's consensus key earns rewards, but <strong style="color:#34d399">only the owner address can unstake or withdraw</strong>." The node wallet can only sign consensus messages — if the server is compromised, the attacker cannot move funds. The owner address (your cold/hardware wallet) is the sole key that can call <code>unstake</code> or <code>withdraw</code>. Think of it as: the node is a worker, the owner holds the paycheck.
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 1: Owner Machine (cold/secure)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Create the OWNER wallet on a secure machine (offline preferred)
+rusk-wallet create
+
+# Note your owner address — you'll need it for the staking step
+rusk-wallet addresses
+# Example output: owner address = 27xyK9gR...a1Bk</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 2: Node Machine (server/VPS)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Install Rusk node
+curl --proto '=https' --tlsv1.2 -sSfL \
+  https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh \
+  | sudo bash
+
+# Create a SEPARATE wallet on the node (different mnemonic!)
+rusk-wallet create
+
+# Export consensus key for the node to use
+rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+sh /opt/dusk/bin/setup_consensus_pwd.sh
+
+# Fast sync state, then start node
+service rusk stop && download_state && service rusk start
+
+# Wait for sync — check block height matches explorer
+ruskquery block-height</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 3: Stake with --owner (from node wallet)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># From the NODE machine, stake with the --owner flag
+# Replace &lt;owner-address&gt; with the address from Step 1
+rusk-wallet stake --amt 1000 --owner &lt;owner-address&gt;
+
+# Verify stake and owner assignment
+rusk-wallet stake-info
+# You should see: owner = &lt;owner-address&gt; (NOT the node address)
+
+# What this means:
+#   Node wallet → signs blocks, earns rewards
+#   Owner wallet → sole key that can unstake or withdraw
+#   Server hacked? → attacker CANNOT touch staked DUSK</code></pre>
+        </div>
+
+        <div class="key-points">
+          <div class="key-points-title">Security Model</div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Node compromised?</strong> Attacker can only sign consensus — cannot unstake, withdraw, or move funds</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Owner key</strong> stays on a hardware wallet, airgapped machine, or secure cold storage</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Two separate mnemonics</strong> — do not use the same mnemonic on both machines</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>To unstake later:</strong> run <span class="mono">rusk-wallet unstake</span> from the owner wallet only</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>Recommended by <a href="https://docs.dusk.network/operator/guides/node-wallet-setup" target="_blank" rel="noopener noreferrer" style="color:var(--purple-light)">Dusk docs</a> for validators with significant stake</span></div>
+        </div>
+      </div>
+
+      <!-- Panel C: USB Cold Storage -->
+      <div id="panel-usb-cold">
+        <!-- SVG: USB Cold Storage Flow -->
+        <div class="diagram">
+          <svg viewBox="0 0 760 250" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="USB cold storage setup: LUKS-encrypted USB holds owner wallet, separate from hot node">
+            <!-- USB Drive -->
+            <rect x="20" y="10" width="220" height="95" rx="10" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+            <text x="130" y="32" fill="#34d399" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🔐 USB Drive (LUKS)</text>
+            <text x="130" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Encrypted partition</text>
+            <text x="130" y="67" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Contains: owner wallet files</text>
+            <text x="130" y="84" fill="#34d399" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">Lost USB = unreadable without 
