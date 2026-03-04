@@ -1,0 +1,140 @@
+link">⚙ GitHub: Rusk Node</a>
+    <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="doc-link">🔗 Multilayer Architecture</a>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────
+  SECTION 2: ARCHITECTURE
+────────────────────────────────────────────────────── -->
+<section class="section" id="architecture">
+  <div class="section-badge">Section 01</div>
+  <h2 class="section-title">Protocol Architecture</h2>
+  <p class="section-subtitle">A modular three-layer stack: settlement at the base, EVM and privacy execution on top, connected by a trustless native bridge.</p>
+
+  <!-- SVG: Full Architecture -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Dusk architecture diagram">
+      <!-- DuskDS layer -->
+      <rect x="30" y="200" width="700" height="72" rx="8" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="1.5"/>
+      <text x="50" y="225" fill="#38bdf8" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskDS — Settlement &amp; Data Availability Layer</text>
+      <rect x="50" y="234" width="95" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="97" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Rusk Node</text>
+      <rect x="152" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="207" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Succinct Attest.</text>
+      <rect x="269" y="234" width="100" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="319" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Phoenix (Private)</text>
+      <rect x="376" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="431" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Moonlight (Public)</text>
+      <rect x="493" y="234" width="90" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="538" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Stake Contract</text>
+      <rect x="590" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="645" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Kadcast P2P</text>
+      <!-- Execution Layer -->
+      <rect x="30" y="110" width="335" height="72" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="50" y="135" fill="#a78bfa" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskVM — Privacy Execution</text>
+      <rect x="50" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="97" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Piecrust VM</text>
+      <rect x="152" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="199" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Rust / WASM</text>
+      <rect x="254" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="301" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">PLONK ZK</text>
+      <rect x="395" y="110" width="335" height="72" rx="8" fill="#1a1a2e" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="415" y="135" fill="#93c5fd" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskEVM — EVM Execution</text>
+      <rect x="415" y="144" width="85" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="457" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">OP Stack</text>
+      <rect x="507" y="144" width="85" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="549" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Solidity</text>
+      <rect x="599" y="144" width="115" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="656" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">MetaMask/Hardhat</text>
+      <!-- Native Bridge -->
+      <rect x="320" y="82" width="120" height="24" rx="5" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1"/>
+      <text x="380" y="98" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">⟷ Native Bridge</text>
+      <!-- Arrows up -->
+      <path d="M197 182 L197 200" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M562 182 L562 200" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M197 110 L197 94" stroke="#8B5CF6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M562 110 L562 94" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <!-- DUSK label -->
+      <circle cx="380" cy="50" r="28" fill="rgba(139,92,246,0.15)" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="380" y="46" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">DUSK</text>
+      <text x="380" y="60" fill="rgba(167,139,250,0.7)" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">token</text>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🔵 DuskDS — Foundation</div>
+      <div class="card-body">
+        <ul>
+          <li>Canonical chain ordering &amp; finality</li>
+          <li>Succinct Attestation consensus (PoS)</li>
+          <li>Phoenix + Moonlight transaction models</li>
+          <li>Transfer &amp; Stake genesis contracts</li>
+          <li>Kadcast P2P networking (UDP 9000)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">🟣 DuskVM — Privacy Execution</div>
+      <div class="card-body">
+        <ul>
+          <li>Piecrust WASM VM (10× faster than predecessor)</li>
+          <li>ZK-friendly host functions: PLONK, Groth16, BLS</li>
+          <li>Rust contracts with <code>#[contract]</code> macro</li>
+          <li>Delta-based state — only changes persisted</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">🔷 DuskEVM — EVM Execution</div>
+      <div class="card-body">
+        <ul>
+          <li>Full EVM equivalence via OP Stack port</li>
+          <li>Settles to DuskDS — no 7-day fault window</li>
+          <li>Standard tooling: MetaMask, Hardhat, Foundry</li>
+          <li>Chain IDs: 744 (mainnet), 745 (testnet)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">⟷ Native Bridge</div>
+      <div class="card-body">
+        <ul>
+          <li>Trustless, no wrapped assets needed</li>
+          <li>Single DUSK token across all three layers</li>
+          <li>MIPS pre-verifier eliminates fraud proof delay</li>
+          <li>~15 min withdrawal finalization</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/overview" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Architecture Overview</a>
+    <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="doc-link">🔗 Multilayer Evolution</a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Rusk GitHub</a>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────────────────────────
+  SECTION 3: CONSENSUS
+────────────────────────────────────────────────────── -->
+<section class="section" id="consensus">
+  <div class="section-badge">Section 02</div>
+  <h2 class="section-title">Succinct Attestation</h2>
+  <p class="section-subtitle">Dusk’s PoS consensus delivers deterministic finality in three clean steps — essential for financial settlement applications.</p>
+
+  <!-- SVG: SA Round Flow -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Succinct Attestation 3-step consensus round diagram">
+      <!-- Background circles -->
+      <circle cx="130" cy="120" r="80" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
+      <circle cx="380" cy="120" r="80" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.15)" stroke-width="1"/>
+      <circle cx="630" cy="120" r="80" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.15)" stroke-width="1"/>
+      <!-- Step 1: Proposal -->
+      <circle cx="130" cy="100" r="30" fill="#8B5CF6" opacity="0.9"/>
+      <text x="130" y="96" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">STEP</text>
+      <text x="130" y="110" fill="white" font-family="Inter,sans-serif" font-size="16" font-weight="800" text-anchor="middle">1</text>
+      <text x="130" y="148" fill="#a78bfa" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">PROPOSAL</text>
+      <text x="130" y="165" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">1 selected proposer</text>
+      <text x="130" y="179" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5
