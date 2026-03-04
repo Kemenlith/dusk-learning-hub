@@ -15,3 +15,2838 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+<style>
+/* ── CSS Custom Properties ── */
+:root {
+  --bg: #0f0f11;
+  --surface: #1a1a2e;
+  --surface2: #16213e;
+  --surface3: #0d1b2a;
+  --border: rgba(139,92,246,0.15);
+  --border-subtle: rgba(255,255,255,0.06);
+  --purple: #8B5CF6;
+  --purple-dark: #6D28D9;
+  --purple-light: #a78bfa;
+  --purple-faint: rgba(139,92,246,0.1);
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --green: #10b981;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --transition: 180ms cubic-bezier(0.16,1,0.3,1);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: var(--purple-light); text-decoration: none; }
+a:hover { color: var(--purple); text-decoration: underline; }
+ul, ol { padding-left: 1.25rem; }
+li { margin-bottom: 0.35rem; }
+code { font-family: var(--font-mono); font-size: 0.85em; }
+
+/* ── Layout ── */
+#app { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: var(--sidebar-w);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform var(--transition);
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.sidebar-logo {
+  padding: 1.25rem 1rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+.sidebar-logo:hover { text-decoration: none; }
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-text { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.logo-sub { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.sidebar-search-btn {
+  margin: 0.75rem 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background var(--transition), border-color var(--transition);
+}
+.sidebar-search-btn:hover { background: rgba(139,92,246,0.08); border-color: var(--border); color: var(--text-muted); }
+.sidebar-search-btn kbd {
+  margin-left: auto;
+  font-size: 0.65rem;
+  background: rgba(255,255,255,0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.sidebar-nav { flex: 1; padding: 0.5rem 0; }
+.nav-group { margin-bottom: 0.25rem; }
+.nav-group-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  padding: 0.75rem 1rem 0.25rem;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.3;
+}
+.nav-link:hover { color: var(--text); background: rgba(139,92,246,0.06); text-decoration: none; }
+.nav-link.active { color: var(--purple-light); border-left-color: var(--purple); background: rgba(139,92,246,0.08); }
+.nav-num {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  min-width: 1.2rem;
+}
+
+/* ── Mobile Header ── */
+#mobile-header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: rgba(15,15,17,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.75rem;
+  z-index: 200;
+}
+#hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--text-muted);
+}
+#mobile-logo { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+
+/* ── Main Content ── */
+#main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Sections ── */
+.section {
+  padding: 4rem 3rem;
+  border-bottom: 1px solid var(--border-subtle);
+  max-width: 960px;
+  opacity: 1;
+}
+
+/* ── Section Headers ── */
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--purple-light);
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.2);
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.section-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+  max-width: 65ch;
+}
+
+/* ── SVG Diagram Container ── */
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+.diagram svg { width: 100%; height: auto; }
+
+/* ── Content Grid ── */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.content-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: border-color var(--transition);
+}
+.content-card:hover { border-color: var(--border); }
+.card-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--purple-light);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.card-body { font-size: 0.82rem; color: var(--text-muted); }
+.card-body ul { padding-left: 1rem; }
+.card-body li { margin-bottom: 0.25rem; }
+
+/* ── Key Points ── */
+.key-points {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.key-points-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+.key-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.key-point:last-child { border-bottom: none; }
+.kp-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--purple);
+  margin-top: 0.45rem;
+  flex-shrink: 0;
+}
+
+/* ── Code Blocks ── */
+.code-block-wrap {
+  position: relative;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid rgba(139,92,246,0.2);
+}
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26,26,46,0.8);
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(139,92,246,0.15);
+}
+.code-lang {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--purple-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.copy-btn {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all var(--transition);
+}
+.copy-btn:hover { border-color: var(--purple); color: var(--purple-light); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); }
+.code-block-wrap pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: #0d0d1a !important;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.code-block-wrap pre code { font-size: 0.78rem; }
+
+/* ── Links Row ── */
+.doc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  text-decoration: none;
+  transition: all var(--transition);
+}
+.doc-link:hover { color: var(--purple-light); border-color: var(--border); background: var(--purple-faint); text-decoration: none; }
+
+/* ── Table ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+.data-table th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  background: rgba(26,26,46,0.5);
+  font-weight: 600;
+}
+.data-table td {
+  padding: 0.65rem 0.75rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: top;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(139,92,246,0.04); }
+.check { color: var(--green); font-weight: 600; }
+.cross { color: var(--text-dim); }
+.highlight-row td { color: var(--text); }
+.dusk-cell { color: var(--purple-light); font-weight: 500; }
+
+/* ── Comparison Section ── */
+.compare-advantage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.adv-card {
+  background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(109,40,217,0.04));
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+.adv-icon { font-size: 1.25rem; margin-bottom: 0.4rem; }
+.adv-title { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+.adv-desc { font-size: 0.75rem; color: var(--text-muted); }
+
+/* ── Tab Switcher (Node Setup) ── */
+.tab-wrap { margin-bottom: 2rem; }
+.tab-inputs { display: none; }
+.tab-labels {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border-subtle);
+  margin-bottom: 1.5rem;
+}
+.tab-label {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition);
+  user-select: none;
+}
+.tab-label:hover { color: var(--text-muted); }
+#tab-standard:checked ~ .tab-labels .tab-label-standard,
+#tab-separated:checked ~ .tab-labels .tab-label-separated,
+#tab-usb-cold:checked ~ .tab-labels .tab-label-usb-cold {
+  color: var(--purple-light);
+  border-bottom-color: var(--purple);
+}
+.tab-panels > div { display: none; }
+#tab-standard:checked ~ .tab-panels #panel-standard,
+#tab-separated:checked ~ .tab-panels #panel-separated,
+#tab-usb-cold:checked ~ .tab-panels #panel-usb-cold {
+  display: block;
+}
+
+/* ── Hero Section ── */
+#hero { padding-top: 5rem; }
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--purple-light);
+  margin-bottom: 1rem;
+}
+.hero-title {
+  font-size: clamp(1.75rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.hero-title span {
+  background: linear-gradient(135deg, var(--purple-light), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 56ch;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+}
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.hero-badge.purple { background: rgba(139,92,246,0.15); color: var(--purple-light); border: 1px solid rgba(139,92,246,0.25); }
+.hero-badge.green { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+.hero-badge.blue { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+
+/* ── Stats Row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0 2rem;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.stat-val { font-size: 1.4rem; font-weight: 700; color: var(--purple-light); font-family: var(--font-mono); }
+.stat-label { font-size: 0.68rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+/* ── Resources Grid ── */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.resource-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.resource-card:hover { border-color: var(--border); background: rgba(26,26,46,0.8); transform: translateY(-1px); text-decoration: none; }
+.resource-icon { font-size: 1.25rem; }
+.resource-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.resource-desc { font-size: 0.75rem; color: var(--text-muted); }
+.resource-url { font-size: 0.68rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: auto; }
+
+
+/* ── Ecosystem Grid ── */
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.eco-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.eco-card:hover { border-color: var(--border); background: rgba(26,26,46,0.8); transform: translateY(-1px); text-decoration: none; }
+.eco-card-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.15rem; }
+.eco-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.15rem 0.45rem; border-radius: 3px;
+  background: var(--purple-faint); color: var(--purple-light);
+}
+.eco-badge.green { background: rgba(16,185,129,0.12); color: var(--green); }
+.eco-badge.yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.eco-card-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.eco-card-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+.eco-card-url { font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: auto; padding-top: 0.25rem; }
+.eco-category { margin-top: 1.5rem; }
+.eco-category-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--purple-light); margin-bottom: 0.75rem; padding-left: 0.25rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.eco-category-label::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+@media (max-width: 768px) {
+  .eco-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .eco-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Search Modal ── */
+#search-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 8vh;
+}
+#search-overlay.open { display: flex; }
+#search-modal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+#search-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  outline: none;
+}
+#search-input::placeholder { color: var(--text-dim); }
+#search-results { max-height: 380px; overflow-y: auto; }
+.search-result {
+  display: block;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition);
+}
+.search-result:last-child { border-bottom: none; }
+.search-result:hover { background: var(--purple-faint); }
+.sr-title { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+.sr-section { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.15rem; }
+.sr-match { color: var(--purple-light); }
+.search-empty { padding: 2rem 1.25rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
+.search-footer {
+  padding: 0.6rem 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  display: flex;
+  gap: 1rem;
+}
+.search-footer kbd { background: rgba(255,255,255,0.06); padding: 0.1rem 0.3rem; border-radius: 3px; }
+
+/* ── Mobile Overlay ── */
+#sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99;
+}
+
+/* ── Inline purple emphasis ── */
+strong { color: var(--text); font-weight: 600; }
+.purple-text { color: var(--purple-light); }
+.mono { font-family: var(--font-mono); font-size: 0.82em; color: var(--purple-light); }
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border-subtle); margin: 1.5rem 0; }
+
+/* ── Comparison table special styles ── */
+.compare-header-eth { background: rgba(59,130,246,0.08); }
+.compare-header-dusk { background: rgba(139,92,246,0.12); }
+.compare-eth { color: #93c5fd; }
+.compare-dusk { color: var(--purple-light); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .compare-advantage-grid { grid-template-columns: repeat(2,1fr); }
+}
+
+@media (max-width: 768px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #sidebar-overlay.open { display: block; }
+  #mobile-header { display: flex; }
+  #main { margin-left: 0; padding-top: var(--header-h); }
+  .section { padding: 2.5rem 1.25rem; }
+  .section-title { font-size: 1.4rem; }
+  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .resources-grid { grid-template-columns: 1fr; }
+  .compare-advantage-grid { grid-template-columns: 1fr; }
+  .data-table { font-size: 0.72rem; }
+  .data-table th, .data-table td { padding: 0.5rem; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── Sidebar ── -->
+<nav id="sidebar" aria-label="Site navigation">
+  <a href="#hero" class="sidebar-logo">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M9 2L15 5.5V12.5L9 16L3 12.5V5.5L9 2Z" stroke="white" stroke-width="1.5" fill="rgba(255,255,255,0.1)"/>
+        <path d="M9 6L12 7.75V11.25L9 13L6 11.25V7.75L9 6Z" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">Dusk Learning Hub</div>
+      <div class="logo-sub">v5 · docs.dusk.network</div>
+    </div>
+  </a>
+
+  <button class="sidebar-search-btn" id="open-search" aria-label="Search">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Search…
+    <kbd>Ctrl+K</kbd>
+  </button>
+
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="#hero" class="nav-link active" data-section="hero"><span class="nav-num">00</span> Overview</a>
+    <a href="#architecture" class="nav-link" data-section="architecture"><span class="nav-num">01</span> Architecture</a>
+    <a href="#consensus" class="nav-link" data-section="consensus"><span class="nav-num">02</span> Consensus</a>
+    <a href="#transactions" class="nav-link" data-section="transactions"><span class="nav-num">03</span> Transactions</a>
+    <a href="#kadcast" class="nav-link" data-section="kadcast"><span class="nav-num">04</span> Kadcast P2P</a>
+    <div class="nav-group-label">Development</div>
+    <a href="#duskevm" class="nav-link" data-section="duskevm"><span class="nav-num">05</span> DuskEVM</a>
+    <a href="#economic" class="nav-link" data-section="economic"><span class="nav-num">06</span> Economic Protocol</a>
+    <a href="#comparison" class="nav-link" data-section="comparison"><span class="nav-num">07</span> Dusk vs Ethereum</a>
+    <div class="nav-group-label">Operations</div>
+    <a href="#node-setup" class="nav-link" data-section="node-setup"><span class="nav-num">08</span> Node Setup</a>
+    <a href="#smart-contracts" class="nav-link" data-section="smart-contracts"><span class="nav-num">09</span> Smart Contracts</a>
+    <a href="#wallet" class="nav-link" data-section="wallet"><span class="nav-num">10</span> Wallet & Keys</a>
+    <a href="#maintenance" class="nav-link" data-section="maintenance"><span class="nav-num">11</span> Node Maintenance</a>
+    <a href="#ecosystem" class="nav-link" data-section="ecosystem"><span class="nav-num">12</span> Ecosystem</a>
+    <a href="#resources" class="nav-link" data-section="resources"><span class="nav-num">13</span> Resources</a>
+  </div>
+</nav>
+
+<!-- ── Mobile Header ── -->
+<header id="mobile-header">
+  <button id="hamburger" aria-label="Open navigation">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <span id="mobile-logo">Dusk Learning Hub</span>
+  <button class="copy-btn" id="mobile-search" style="margin-left:auto" aria-label="Search">Search</button>
+</header>
+<div id="sidebar-overlay"></div>
+
+<!-- ── Main Content ── -->
+<main id="main">
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 1: HERO
+──────────────────────────────────────────────────── -->
+<section class="section" id="hero">
+  <!-- SVG: 3-Layer Stack -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 260" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dusk 3-layer modular stack diagram">
+      <defs>
+        <linearGradient id="gPurple" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.9"/><stop offset="100%" stop-color="#6D28D9" stop-opacity="0.9"/></linearGradient>
+        <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.85"/><stop offset="100%" stop-color="#2563eb" stop-opacity="0.85"/></linearGradient>
+        <linearGradient id="gTeal" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.85"/><stop offset="100%" stop-color="#0284c7" stop-opacity="0.85"/></linearGradient>
+      </defs>
+      <!-- Bridge connector -->
+      <line x1="380" y1="50" x2="380" y2="220" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="4 3" opacity="0.4"/>
+      <text x="392" y="140" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" opacity="0.7">Native Bridge</text>
+      <!-- DuskVM top layer -->
+      <rect x="50" y="28" width="290" height="56" rx="8" fill="url(#gPurple)" opacity="0.95"/>
+      <text x="70" y="52" fill="white" font-family="Inter,sans-serif" font-size="13" font-weight="700">DuskVM</text>
+      <text x="70" y="68" fill="rgba(255,255,255,0.8)" font-family="Inter,sans-serif" font-size="10">WASM · Piecrust · ZK-Native · Privacy-Preserving</text>
+      <rect x="235" y="38" width="90" height="20" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="280" y="52" fill="white" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Rust / WASM</text>
+      <!-- DuskEVM middle layer -->
+      <rect x="50" y="100" width="290" height="56" rx="8" fill="url(#gBlue)" opacity="0.95"/>
+      <text x="70" y="124" fill="white" font-family="Inter,sans-serif" font-size="13" font-weight="700">DuskEVM</text>
+      <text x="70" y="140" fill="rgba(255,255,255,0.8)" font-family="Inter,sans-serif" font-size="10">OP Stack · Solidity · MetaMask · Hardhat Compatible</text>
+      <rect x="235" y="110" width="90" height="20" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="280" y="124" fill="white" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">EVM / Solidity</text>
+      <!-- DuskDS bottom layer -->
+      <rect x="50" y="172" width="290" height="56" rx="8" fill="url(#gTeal)" opacity="0.95"/>
+      <text x="70" y="196" fill="white" font-family="Inter,sans-serif" font-size="13" font-weight="700">DuskDS</text>
+      <text x="70" y="212" fill="rgba(255,255,255,0.8)" font-family="Inter,sans-serif" font-size="10">Settlement · Consensus · Data Availability · Staking</text>
+      <rect x="235" y="182" width="90" height="20" rx="4" fill="rgba(255,255,255,0.12)"/>
+      <text x="280" y="196" fill="white" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">DUSK Token</text>
+      <!-- Right side: single DUSK token -->
+      <rect x="460" y="80" width="240" height="100" rx="10" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1.5" stroke-opacity="0.4"/>
+      <text x="580" y="110" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Single DUSK Token</text>
+      <text x="580" y="128" fill="rgba(148,163,184,0.8)" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Fuels all three layers</text>
+      <circle cx="536" cy="155" r="14" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1"/>
+      <text x="536" y="159" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">DS</text>
+      <circle cx="580" cy="155" r="14" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1"/>
+      <text x="580" y="159" fill="#93c5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">EVM</text>
+      <circle cx="624" cy="155" r="14" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1"/>
+      <text x="624" y="159" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">VM</text>
+      <!-- Layer arrows -->
+      <path d="M170 84 L170 100" stroke="white" stroke-width="1.5" stroke-opacity="0.3" marker-end="url(#arrow)"/>
+      <path d="M170 156 L170 172" stroke="white" stroke-width="1.5" stroke-opacity="0.3" marker-end="url(#arrow)"/>
+      <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.3)"/></marker></defs>
+    </svg>
+  </div>
+
+  <div class="hero-tag">
+    <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#10b981"/></svg>
+    Mainnet · Live
+  </div>
+  <h1 class="hero-title">The <span>Dusk Network</span><br>Learning Hub</h1>
+  <p class="hero-desc">Privacy-first regulated blockchain for real-world assets. A visual, developer-focused reference for the Dusk protocol — architecture, consensus, node operations, and smart contracts.</p>
+
+  <div class="hero-badges">
+    <span class="hero-badge purple">Privacy by Design</span>
+    <span class="hero-badge green">Regulatory Ready</span>
+    <span class="hero-badge blue">EVM Compatible</span>
+    <span class="hero-badge purple">ZK-Native</span>
+    <span class="hero-badge green">Min 1,000 DUSK Stake</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val">1,000</div><div class="stat-label">Min DUSK to Stake</div></div>
+    <div class="stat-card"><div class="stat-val">~10s</div><div class="stat-label">Block Time</div></div>
+    <div class="stat-card"><div class="stat-val">1B</div><div class="stat-label">Max DUSK Supply</div></div>
+    <div class="stat-card"><div class="stat-val">~2s</div><div class="stat-label">DuskEVM Block Time</div></div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/overview" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Official Docs</a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ GitHub: Rusk Node</a>
+    <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="doc-link">🔗 Multilayer Architecture</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 2: ARCHITECTURE
+──────────────────────────────────────────────────── -->
+<section class="section" id="architecture">
+  <div class="section-badge">Section 01</div>
+  <h2 class="section-title">Protocol Architecture</h2>
+  <p class="section-subtitle">A modular three-layer stack: settlement at the base, EVM and privacy execution on top, connected by a trustless native bridge.</p>
+
+  <!-- SVG: Full Architecture -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Full Dusk architecture diagram">
+      <!-- DuskDS layer -->
+      <rect x="30" y="200" width="700" height="72" rx="8" fill="#1a1a2e" stroke="#0ea5e9" stroke-width="1.5"/>
+      <text x="50" y="225" fill="#38bdf8" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskDS — Settlement &amp; Data Availability Layer</text>
+      <rect x="50" y="234" width="95" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="97" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Rusk Node</text>
+      <rect x="152" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="207" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Succinct Attest.</text>
+      <rect x="269" y="234" width="100" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="319" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Phoenix (Private)</text>
+      <rect x="376" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="431" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Moonlight (Public)</text>
+      <rect x="493" y="234" width="90" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="538" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Stake Contract</text>
+      <rect x="590" y="234" width="110" height="26" rx="4" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+      <text x="645" y="251" fill="#7dd3fc" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Kadcast P2P</text>
+      <!-- Execution Layer -->
+      <rect x="30" y="110" width="335" height="72" rx="8" fill="#1a1a2e" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="50" y="135" fill="#a78bfa" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskVM — Privacy Execution</text>
+      <rect x="50" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="97" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Piecrust VM</text>
+      <rect x="152" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="199" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Rust / WASM</text>
+      <rect x="254" y="144" width="95" height="26" rx="4" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="301" y="161" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">PLONK ZK</text>
+      <rect x="395" y="110" width="335" height="72" rx="8" fill="#1a1a2e" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="415" y="135" fill="#93c5fd" font-family="Inter,sans-serif" font-size="12" font-weight="700">DuskEVM — EVM Execution</text>
+      <rect x="415" y="144" width="85" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="457" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">OP Stack</text>
+      <rect x="507" y="144" width="85" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="549" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Solidity</text>
+      <rect x="599" y="144" width="115" height="26" rx="4" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="656" y="161" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">MetaMask/Hardhat</text>
+      <!-- Native Bridge -->
+      <rect x="320" y="82" width="120" height="24" rx="5" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1"/>
+      <text x="380" y="98" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">⟷ Native Bridge</text>
+      <!-- Arrows up -->
+      <path d="M197 182 L197 200" stroke="#0ea5e9" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M562 182 L562 200" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M197 110 L197 94" stroke="#8B5CF6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <path d="M562 110 L562 94" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+      <!-- DUSK label -->
+      <circle cx="380" cy="50" r="28" fill="rgba(139,92,246,0.15)" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="380" y="46" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">DUSK</text>
+      <text x="380" y="60" fill="rgba(167,139,250,0.7)" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">token</text>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🔵 DuskDS — Foundation</div>
+      <div class="card-body">
+        <ul>
+          <li>Canonical chain ordering &amp; finality</li>
+          <li>Succinct Attestation consensus (PoS)</li>
+          <li>Phoenix + Moonlight transaction models</li>
+          <li>Transfer &amp; Stake genesis contracts</li>
+          <li>Kadcast P2P networking (UDP 9000)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">🟣 DuskVM — Privacy Execution</div>
+      <div class="card-body">
+        <ul>
+          <li>Piecrust WASM VM (10× faster than predecessor)</li>
+          <li>ZK-friendly host functions: PLONK, Groth16, BLS</li>
+          <li>Rust contracts with <code>#[contract]</code> macro</li>
+          <li>Delta-based state — only changes persisted</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">🔷 DuskEVM — EVM Execution</div>
+      <div class="card-body">
+        <ul>
+          <li>Full EVM equivalence via OP Stack port</li>
+          <li>Settles to DuskDS — no 7-day fault window</li>
+          <li>Standard tooling: MetaMask, Hardhat, Foundry</li>
+          <li>Chain IDs: 744 (mainnet), 745 (testnet)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">⟷ Native Bridge</div>
+      <div class="card-body">
+        <ul>
+          <li>Trustless, no wrapped assets needed</li>
+          <li>Single DUSK token across all three layers</li>
+          <li>MIPS pre-verifier eliminates fraud proof delay</li>
+          <li>~15 min withdrawal finalization</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/overview" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Architecture Overview</a>
+    <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="doc-link">🔗 Multilayer Evolution</a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Rusk GitHub</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 3: CONSENSUS
+──────────────────────────────────────────────────── -->
+<section class="section" id="consensus">
+  <div class="section-badge">Section 02</div>
+  <h2 class="section-title">Succinct Attestation</h2>
+  <p class="section-subtitle">Dusk's PoS consensus delivers deterministic finality in three clean steps — essential for financial settlement applications.</p>
+
+  <!-- SVG: SA Round Flow -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Succinct Attestation 3-step consensus round diagram">
+      <!-- Background circles -->
+      <circle cx="130" cy="120" r="80" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
+      <circle cx="380" cy="120" r="80" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.15)" stroke-width="1"/>
+      <circle cx="630" cy="120" r="80" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.15)" stroke-width="1"/>
+      <!-- Step 1: Proposal -->
+      <circle cx="130" cy="100" r="30" fill="#8B5CF6" opacity="0.9"/>
+      <text x="130" y="96" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">STEP</text>
+      <text x="130" y="110" fill="white" font-family="Inter,sans-serif" font-size="16" font-weight="800" text-anchor="middle">1</text>
+      <text x="130" y="148" fill="#a78bfa" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">PROPOSAL</text>
+      <text x="130" y="165" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">1 selected proposer</text>
+      <text x="130" y="179" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">broadcasts candidate block</text>
+      <!-- Step 2: Validation -->
+      <circle cx="380" cy="100" r="30" fill="#3b82f6" opacity="0.9"/>
+      <text x="380" y="96" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">STEP</text>
+      <text x="380" y="110" fill="white" font-family="Inter,sans-serif" font-size="16" font-weight="800" text-anchor="middle">2</text>
+      <text x="380" y="148" fill="#93c5fd" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">VALIDATION</text>
+      <text x="380" y="165" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Committee votes on validity</text>
+      <text x="380" y="179" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">quorum threshold required</text>
+      <!-- Step 3: Ratification -->
+      <circle cx="630" cy="100" r="30" fill="#10b981" opacity="0.9"/>
+      <text x="630" y="96" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">STEP</text>
+      <text x="630" y="110" fill="white" font-family="Inter,sans-serif" font-size="16" font-weight="800" text-anchor="middle">3</text>
+      <text x="630" y="148" fill="#34d399" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">RATIFICATION</text>
+      <text x="630" y="165" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">2nd committee confirms</text>
+      <text x="630" y="179" fill="#34d399" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">→ FINAL</text>
+      <!-- Arrows between steps -->
+      <path d="M215 100 L295 100" stroke="#8B5CF6" stroke-width="2" opacity="0.5" marker-end="url(#arrowPurple)"/>
+      <path d="M465 100 L545 100" stroke="#3b82f6" stroke-width="2" opacity="0.5" marker-end="url(#arrowBlue)"/>
+      <defs>
+        <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="rgba(139,92,246,0.5)"/></marker>
+        <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="rgba(59,130,246,0.5)"/></marker>
+      </defs>
+      <!-- Deterministic Sortition label -->
+      <rect x="170" y="198" width="420" height="26" rx="5" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+      <text x="380" y="215" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" font-weight="600">Deterministic Sortition — stake-weighted, non-interactive committee selection</text>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">⚡ Key Properties</div>
+      <div class="card-body">
+        <ul>
+          <li>Minimum 1,000 DUSK to stake &amp; participate</li>
+          <li>2-epoch maturity period (4,320 blocks) before earning</li>
+          <li>Deterministic Sortition — no randomness oracle needed</li>
+          <li>BLS signature aggregation for compact certificates</li>
+          <li>Security: honest stake &gt; 2/3 of total</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">📏 Epoch &amp; Round Parameters</div>
+      <div class="card-body">
+        <ul>
+          <li>1 epoch = 2,160 blocks</li>
+          <li>64 committee credits per round</li>
+          <li>Max 50 iterations per round before timeout</li>
+          <li>Block reward: ~19.86 DUSK/block (Period 1)</li>
+          <li>Split: 70% proposer / 5% validation / 5% ratification / 10% treasury</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-points">
+    <div class="key-points-title">Finality States</div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>Accepted</strong> — block passed all 3 steps in current round</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>Confirmed</strong> — block has subsequent blocks building on it</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>Stable</strong> — sufficiently buried, probabilistically irreversible</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>Final</strong> — deterministic, cryptographically guaranteed finality — cannot be reversed</span></div>
+  </div>
+
+  <!-- SVG: Committee Ring Visualization -->
+  <h3 style="color:var(--text-muted);font-size:0.95rem;font-weight:600;margin:2rem 0 0.75rem">Committee Selection Visualized</h3>
+  <div class="diagram">
+    <svg viewBox="0 0 700 380" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animated committee ring showing proposer, validators, and ratifiers selected from a circle of provisioner nodes">
+      <!-- Circle of 12 provisioner nodes -->
+      <g id="node-ring-v5">
+        <circle cx="350" cy="80" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="405" cy="86" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="446" cy="118" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="460" cy="170" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="446" cy="222" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="405" cy="254" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="350" cy="260" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="295" cy="254" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="254" cy="222" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="240" cy="170" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="254" cy="118" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+        <circle cx="295" cy="86" r="11" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+      </g>
+      <!-- PROPOSER: highlighted node at top -->
+      <circle cx="350" cy="80" r="16" fill="#8B5CF6" opacity="0.9"/>
+      <text x="350" y="84" text-anchor="middle" font-size="8" fill="#fff" font-weight="700" font-family="Inter,sans-serif">GEN</text>
+      <!-- Pulse animation on proposer -->
+      <circle cx="350" cy="80" r="16" fill="none" stroke="#8B5CF6" stroke-width="1.5" opacity="0.6">
+        <animate attributeName="r" from="16" to="30" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.6" to="0" dur="1.8s" repeatCount="indefinite"/>
+      </circle>
+      <!-- VALIDATION COMMITTEE: 4 nodes highlighted green -->
+      <circle cx="446" cy="118" r="14" fill="#10b981" opacity="0.8"/>
+      <text x="446" y="122" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">VAL</text>
+      <circle cx="460" cy="170" r="14" fill="#10b981" opacity="0.8"/>
+      <text x="460" y="174" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">VAL</text>
+      <circle cx="446" cy="222" r="14" fill="#10b981" opacity="0.8"/>
+      <text x="446" y="226" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">VAL</text>
+      <circle cx="295" cy="86" r="14" fill="#10b981" opacity="0.8"/>
+      <text x="295" y="90" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">VAL</text>
+      <!-- RATIFICATION COMMITTEE: 4 nodes highlighted amber -->
+      <circle cx="254" cy="222" r="14" fill="#f59e0b" opacity="0.8"/>
+      <text x="254" y="226" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">RAT</text>
+      <circle cx="240" cy="170" r="14" fill="#f59e0b" opacity="0.8"/>
+      <text x="240" y="174" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">RAT</text>
+      <circle cx="254" cy="118" r="14" fill="#f59e0b" opacity="0.8"/>
+      <text x="254" y="122" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">RAT</text>
+      <circle cx="405" cy="254" r="14" fill="#f59e0b" opacity="0.8"/>
+      <text x="405" y="258" text-anchor="middle" font-size="7" fill="#fff" font-weight="600" font-family="Inter,sans-serif">RAT</text>
+      <!-- IDLE provisioners (not selected this round) -->
+      <circle cx="350" cy="260" r="11" fill="#1a1a2e" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="350" y="264" text-anchor="middle" font-size="6" fill="#64748b" font-family="Inter,sans-serif">IDLE</text>
+      <circle cx="295" cy="254" r="11" fill="#1a1a2e" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="295" y="258" text-anchor="middle" font-size="6" fill="#64748b" font-family="Inter,sans-serif">IDLE</text>
+      <circle cx="405" cy="86" r="11" fill="#1a1a2e" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="405" y="90" text-anchor="middle" font-size="6" fill="#64748b" font-family="Inter,sans-serif">IDLE</text>
+      <!-- Center label -->
+      <text x="350" y="165" text-anchor="middle" fill="#94a3b8" font-family="Inter,sans-serif" font-size="11" font-weight="600">Provisioner Ring</text>
+      <text x="350" y="182" text-anchor="middle" fill="#64748b" font-family="Inter,sans-serif" font-size="9">Deterministic Sortition selects</text>
+      <text x="350" y="195" text-anchor="middle" fill="#64748b" font-family="Inter,sans-serif" font-size="9">committees from staked provisioners</text>
+      <!-- Legend -->
+      <g transform="translate(0,298)">
+        <rect x="80" y="0" width="150" height="30" rx="6" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+        <circle cx="98" cy="15" r="6" fill="#8B5CF6" opacity="0.9"/>
+        <text x="113" y="19" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9" font-weight="600">1. Proposer (1 node)</text>
+        <rect x="250" y="0" width="180" height="30" rx="6" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+        <circle cx="268" cy="15" r="6" fill="#10b981" opacity="0.8"/>
+        <text x="283" y="19" fill="#34d399" font-family="Inter,sans-serif" font-size="9" font-weight="600">2. Validation Committee</text>
+        <rect x="450" y="0" width="180" height="30" rx="6" fill="rgba(245,158,11,0.1)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+        <circle cx="468" cy="15" r="6" fill="#f59e0b" opacity="0.8"/>
+        <text x="483" y="19" fill="#fbbf24" font-family="Inter,sans-serif" font-size="9" font-weight="600">3. Ratification Committee</text>
+      </g>
+      <text x="350" y="355" text-anchor="middle" font-size="9.5" fill="#94a3b8" font-family="Inter,sans-serif">Each round: sortition picks 1 proposer + 2 distinct committees from all staked provisioners</text>
+      <text x="350" y="370" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter,sans-serif">Block is FINAL after ratification — deterministic, no reorg possible</text>
+    </svg>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/deep-dive/succinct-attestation" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Succinct Attestation Deep Dive</a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Consensus Module (Rusk)</a>
+    <a href="https://dusk.network/news/slashing-finalized" target="_blank" rel="noopener noreferrer" class="doc-link">🔗 Slashing Mechanism</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 4: TRANSACTIONS
+──────────────────────────────────────────────────── -->
+<section class="section" id="transactions">
+  <div class="section-badge">Section 03</div>
+  <h2 class="section-title">Phoenix &amp; Moonlight</h2>
+  <p class="section-subtitle">Dusk's dual transaction model — choose privacy or transparency per transaction. Unique in blockchain design.</p>
+
+  <!-- SVG: Phoenix vs Moonlight -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 230" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Phoenix vs Moonlight transaction model comparison diagram">
+      <!-- Phoenix side -->
+      <rect x="30" y="20" width="330" height="190" rx="10" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+      <text x="195" y="48" fill="#a78bfa" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle">🌑 Phoenix</text>
+      <text x="195" y="65" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Private UTXO Model</text>
+      <!-- Phoenix flow: Notes → ZK Proof → Output -->
+      <rect x="50" y="78" width="80" height="30" rx="5" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
+      <text x="90" y="98" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Input Notes</text>
+      <rect x="165" y="78" width="80" height="30" rx="5" fill="rgba(139,92,246,0.3)" stroke="#8B5CF6" stroke-width="1"/>
+      <text x="205" y="98" fill="white" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">ZK Proof</text>
+      <rect x="280" y="78" width="60" height="30" rx="5" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
+      <text x="310" y="98" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Output</text>
+      <path d="M130 93 L162 93" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#ap)"/>
+      <path d="M245 93 L278 93" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#ap)"/>
+      <defs><marker id="ap" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#8B5CF6"/></marker></defs>
+      <!-- Phoenix properties -->
+      <text x="50" y="128" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ Sender hidden</text>
+      <text x="50" y="143" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ Receiver hidden</text>
+      <text x="50" y="158" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ Amount hidden</text>
+      <text x="195" y="128" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">Nullifiers prevent double-spend</text>
+      <text x="195" y="143" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">PLONK proofs (BLS12-381)</text>
+      <text x="195" y="158" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">Phoenix 2.0: sender encryption</text>
+      <text x="50" y="185" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9" font-weight="600">Use: private transfers, OTC, institutional</text>
+
+      <!-- Moonlight side -->
+      <rect x="400" y="20" width="330" height="190" rx="10" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.3)" stroke-width="1.5"/>
+      <text x="565" y="48" fill="#93c5fd" font-family="Inter,sans-serif" font-size="14" font-weight="700" text-anchor="middle">☀ Moonlight</text>
+      <text x="565" y="65" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Transparent Account Model</text>
+      <!-- Moonlight flow -->
+      <rect x="420" y="78" width="80" height="30" rx="5" fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.4)" stroke-width="1"/>
+      <text x="460" y="98" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Account A</text>
+      <rect x="535" y="78" width="80" height="30" rx="5" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <text x="575" y="98" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Transfer Tx</text>
+      <rect x="650" y="78" width="60" height="30" rx="5" fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.4)" stroke-width="1"/>
+      <text x="680" y="98" fill="#bfdbfe" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Account B</text>
+      <path d="M500 93 L533 93" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#ab)"/>
+      <path d="M615 93 L648 93" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#ab)"/>
+      <defs><marker id="ab" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#3b82f6"/></marker></defs>
+      <text x="420" y="128" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ Exchange compatible</text>
+      <text x="420" y="143" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ Higher throughput</text>
+      <text x="420" y="158" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">✓ No ZK proof required</text>
+      <text x="565" y="128" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">MiCA / regulatory compliance</text>
+      <text x="565" y="143" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">EVM-interop friendly</text>
+      <text x="565" y="158" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5">Same gas model as Phoenix</text>
+      <text x="420" y="185" fill="#93c5fd" font-family="Inter,sans-serif" font-size="9" font-weight="600">Use: exchange deposits, DeFi, public payments</text>
+    </svg>
+  </div>
+
+  <div class="key-points">
+    <div class="key-points-title">Conversion: Atomic Swap Between Models</div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>shield</strong> — Moonlight balance → Phoenix notes (public to private)</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span><strong>unshield</strong> — Phoenix notes → Moonlight balance (private to public)</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span>Handled by the Transfer Contract in a <strong>single atomic transaction</strong> — no bridges, no wrapped tokens</span></div>
+    <div class="key-point"><div class="kp-dot"></div><span>Both models can interact with the same smart contracts — full composability</span></div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://github.com/dusk-network/phoenix" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Phoenix GitHub</a>
+    <a href="https://docs.dusk.network/learn/overview" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Core Components</a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Transfer Contract</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 5: KADCAST
+──────────────────────────────────────────────────── -->
+<section class="section" id="kadcast">
+  <div class="section-badge">Section 04</div>
+  <h2 class="section-title">Kadcast P2P Network</h2>
+  <p class="section-subtitle">Structured UDP-based broadcast protocol using Kademlia DHT. O(log n) complexity vs gossip's unpredictable fan-out.</p>
+
+  <!-- SVG: Kadcast broadcast tree -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kadcast broadcast tree showing O(log n) message propagation">
+      <!-- Origin node -->
+      <circle cx="380" cy="30" r="22" fill="#8B5CF6"/>
+      <text x="380" y="26" fill="white" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">ORIGIN</text>
+      <text x="380" y="40" fill="white" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">node</text>
+      <!-- Level 1: 3 delegates (β=3) -->
+      <circle cx="180" cy="105" r="18" fill="#6D28D9" opacity="0.9"/>
+      <circle cx="380" cy="105" r="18" fill="#6D28D9" opacity="0.9"/>
+      <circle cx="580" cy="105" r="18" fill="#6D28D9" opacity="0.9"/>
+      <text x="180" y="109" fill="white" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">B1</text>
+      <text x="380" y="109" fill="white" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">B2</text>
+      <text x="580" y="109" fill="white" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">B3</text>
+      <!-- Arrows from origin to delegates -->
+      <path d="M363 46 L198 90" stroke="#a78bfa" stroke-width="1.5" opacity="0.7"/>
+      <path d="M380 52 L380 88" stroke="#a78bfa" stroke-width="1.5" opacity="0.7"/>
+      <path d="M397 46 L562 90" stroke="#a78bfa" stroke-width="1.5" opacity="0.7"/>
+      <!-- Level 2: each delegate broadcasts to 3 (but smaller) -->
+      <circle cx="100" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="175" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="250" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="305" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="380" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="455" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="510" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="585" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <circle cx="660" cy="180" r="14" fill="#4c1d95" opacity="0.85"/>
+      <!-- Level 2 arrows -->
+      <path d="M170 122 L108 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M180 123 L177 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M190 122 L243 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M370 122 L313 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M380 123 L380 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M390 122 L447 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M570 122 L518 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M580 123 L583 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <path d="M590 122 L652 167" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+      <!-- Labels -->
+      <text x="67" y="103" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" font-weight="600">β = 3 delegates</text>
+      <text x="67" y="117" fill="#64748b" font-family="Inter,sans-serif" font-size="9">per bucket level</text>
+      <!-- RaptorQ label -->
+      <rect x="570" y="18" width="160" height="50" rx="6" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+      <text x="650" y="38" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">RaptorQ FEC</text>
+      <text x="650" y="52" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">12% UDP loss tolerance</text>
+      <text x="650" y="63" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">f = 0.15 overhead</text>
+      <!-- O(log n) label -->
+      <rect x="30" y="195" width="200" height="36" rx="5" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+      <text x="130" y="213" fill="#34d399" font-family="Inter,sans-serif" font-size="11" text-anchor="middle" font-weight="700">O(log n) broadcast</text>
+      <text x="130" y="226" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">vs gossip's unpredictable fanout</text>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🌐 How It Works</div>
+      <div class="card-body">
+        <ul>
+          <li>Peer IDs: 128-bit Blake2b hash of IP+port</li>
+          <li>XOR distance routing (Kademlia-style)</li>
+          <li>k-buckets with LRU eviction + PING/PONG liveness</li>
+          <li>β=3 delegates per bucket on broadcast</li>
+          <li>Duplicate CHUNK messages are ignored (no storms)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">📊 vs Gossip Protocols</div>
+      <div class="card-body">
+        <ul>
+          <li>25–50% bandwidth reduction vs gossip</li>
+          <li>Predictable, lower latency</li>
+          <li>Handles 12% UDP packet loss gracefully</li>
+          <li>Sybil and Eclipse attack resistant by design</li>
+          <li>Port: <span class="mono">9000/UDP</span> — must be open inbound</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://github.com/dusk-network/kadcast" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Kadcast GitHub</a>
+    <a href="https://docs.dusk.network/learn/core-components/" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Core Components</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 6: DUSKEVM
+──────────────────────────────────────────────────── -->
+<section class="section" id="duskevm">
+  <div class="section-badge">Section 05</div>
+  <h2 class="section-title">DuskEVM</h2>
+  <p class="section-subtitle">Full EVM equivalence via OP Stack, settling to DuskDS instead of Ethereum. Solidity contracts with no code changes. Integration time drops from months to ~2 weeks.</p>
+
+  <!-- SVG: DuskEVM OP Stack -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 230" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DuskEVM OP Stack settling to DuskDS, with standard tooling">
+      <!-- DuskDS at bottom -->
+      <rect x="200" y="158" width="360" height="52" rx="8" fill="rgba(14,165,233,0.1)" stroke="#0ea5e9" stroke-width="1.5"/>
+      <text x="380" y="180" fill="#38bdf8" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">DuskDS</text>
+      <text x="380" y="197" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Settlement · Consensus · Data Availability</text>
+      <!-- DuskEVM in middle -->
+      <rect x="200" y="80" width="360" height="60" rx="8" fill="rgba(59,130,246,0.1)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="380" y="103" fill="#93c5fd" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">DuskEVM — OP Stack</text>
+      <text x="280" y="122" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">op-geth</text>
+      <text x="380" y="122" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">op-batcher</text>
+      <text x="480" y="122" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">MIPS pre-verifier</text>
+      <!-- Arrow down: DuskEVM → DuskDS -->
+      <path d="M380 140 L380 158" stroke="#3b82f6" stroke-width="2" opacity="0.6" marker-end="url(#ab2)"/>
+      <defs><marker id="ab2" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="rgba(59,130,246,0.6)"/></marker></defs>
+      <text x="393" y="152" fill="#64748b" font-family="Inter,sans-serif" font-size="9">blobs (EIP-4844)</text>
+      <!-- MIPS pre-verifier badge -->
+      <rect x="460" y="142" width="130" height="18" rx="4" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+      <text x="525" y="154" fill="#34d399" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">No 7-day fault window</text>
+      <!-- Tooling on right -->
+      <rect x="590" y="40" width="140" height="145" rx="8" fill="#1a1a2e" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="660" y="60" fill="#e2e8f0" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Standard Tooling</text>
+      <text x="660" y="78" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">MetaMask</text>
+      <text x="660" y="96" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Hardhat</text>
+      <text x="660" y="114" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Foundry</text>
+      <text x="660" y="132" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">ethers.js / viem</text>
+      <text x="660" y="150" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">OpenZeppelin</text>
+      <text x="660" y="168" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Blockscout Explorer</text>
+      <!-- User at top -->
+      <rect x="270" y="20" width="220" height="38" rx="6" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+      <text x="380" y="38" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">User submits tx via JSON-RPC</text>
+      <text x="380" y="52" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">standard Ethereum endpoint</text>
+      <path d="M380 58 L380 80" stroke="#8B5CF6" stroke-width="1.5" opacity="0.5"/>
+      <!-- Left: gas model -->
+      <rect x="30" y="80" width="145" height="130" rx="8" fill="#1a1a2e" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="102" y="100" fill="#e2e8f0" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Gas Model</text>
+      <text x="102" y="118" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" font-weight="600">L2 Execution Fee</text>
+      <text x="102" y="132" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">EIP-1559 base + tip</text>
+      <line x1="50" y1="140" x2="154" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="102" y="158" fill="#93c5fd" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" font-weight="600">L1 DA Fee</text>
+      <text x="102" y="172" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">blob posting to DuskDS</text>
+      <text x="102" y="196" fill="#34d399" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" font-weight="600">Gas token: DUSK</text>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🌐 Network Config</div>
+      <div class="card-body">
+        <table class="data-table" style="font-size:0.75rem">
+          <thead><tr><th>Network</th><th>Chain ID</th></tr></thead>
+          <tbody>
+            <tr><td>Mainnet</td><td class="mono">744</td></tr>
+            <tr><td>Testnet</td><td class="mono">745</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:0.75rem;color:var(--text-muted)">
+          RPC: <span class="mono">https://rpc.evm.dusk.network</span>
+        </div>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">⚠ EVM Behavioral Differences</div>
+      <div class="card-body">
+        <ul>
+          <li><span class="mono">COINBASE</span> → sequencer fee wallet (not miner)</li>
+          <li><span class="mono">PREVRANDAO</span> → DuskDS beacon (not ETH beacon)</li>
+          <li><span class="mono">tx.origin</span> → aliased for cross-layer calls</li>
+          <li>All other opcodes identical to standard EVM</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block-wrap">
+    <div class="code-block-header"><span class="code-lang">javascript — hardhat.config.js</span><button class="copy-btn">Copy</button></div>
+    <pre><code class="language-javascript">module.exports = {
+  solidity: "0.8.24",
+  networks: {
+    duskEVM: {
+      url: "https://rpc.evm.dusk.network",
+      chainId: 744,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+  },
+};</code></pre>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/deep-dive/dusk-evm" target="_blank" rel="noopener noreferrer" class="doc-link">📄 DuskEVM Deep Dive</a>
+    <a href="https://docs.dusk.network/developer/smart-contracts-dusk-evm/deploy-on-evm/" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Deploy on DuskEVM</a>
+    <a href="https://explorer.evm.dusk.network/" target="_blank" rel="noopener noreferrer" class="doc-link">🔍 EVM Explorer</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 7: ECONOMIC PROTOCOL
+──────────────────────────────────────────────────── -->
+<section class="section" id="economic">
+  <div class="section-badge">Section 06</div>
+  <h2 class="section-title">Economic Protocol</h2>
+  <p class="section-subtitle">How DUSK flows through the system — staking rewards, gas fees, autocontracts, and the transfer contract as financial middleware.</p>
+
+  <!-- SVG: Economic Protocol Flow -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 240" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DUSK token economic flow diagram showing staking rewards, gas fees, and autocontracts">
+      <!-- Central DUSK token -->
+      <circle cx="380" cy="120" r="42" fill="rgba(139,92,246,0.15)" stroke="#8B5CF6" stroke-width="2"/>
+      <text x="380" y="116" fill="#a78bfa" font-family="Inter,sans-serif" font-size="14" font-weight="800" text-anchor="middle">DUSK</text>
+      <text x="380" y="132" fill="rgba(167,139,250,0.7)" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">native token</text>
+      <!-- Block Rewards -->
+      <rect x="30" y="30" width="140" height="56" rx="7" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+      <text x="100" y="54" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Block Reward</text>
+      <text x="100" y="68" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">~19.86 DUSK/block</text>
+      <text x="100" y="80" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Period 1 (halves every 4yr)</text>
+      <path d="M170 58 L337 110" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+      <!-- Staking -->
+      <rect x="30" y="100" width="140" height="56" rx="7" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+      <text x="100" y="124" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Staking</text>
+      <text x="100" y="138" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Min 1,000 DUSK</text>
+      <text x="100" y="150" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Earn 10% of block reward</text>
+      <path d="M170 128 L337 128" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+      <!-- Gas Fees -->
+      <rect x="30" y="170" width="140" height="56" rx="7" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+      <text x="100" y="194" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Gas Fees</text>
+      <text x="100" y="208" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Paid in DUSK</text>
+      <text x="100" y="220" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Contracts can pay on behalf</text>
+      <path d="M170 198 L337 142" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+      <!-- Right side outputs -->
+      <rect x="590" y="30" width="140" height="56" rx="7" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+      <text x="660" y="54" fill="#34d399" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Validators</text>
+      <text x="660" y="68" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">70% + bonus to proposer</text>
+      <text x="660" y="80" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">5%+5% to committees</text>
+      <path d="M422 110 L590 58" stroke="#10b981" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+      <rect x="590" y="100" width="140" height="56" rx="7" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+      <text x="660" y="124" fill="#fbbf24" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Autocontracts</text>
+      <text x="660" y="138" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Autonomous execution</text>
+      <text x="660" y="150" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">triggered by events</text>
+      <path d="M422 128 L590 128" stroke="#f59e0b" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+      <rect x="590" y="170" width="140" height="56" rx="7" fill="rgba(239,68,68,0.08)" stroke="rgba(239,68,68,0.15)" stroke-width="1"/>
+      <text x="660" y="194" fill="#f87171" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Treasury</text>
+      <text x="660" y="208" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">10% of block reward</text>
+      <text x="660" y="220" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">+ burned unclaimed bonus</text>
+      <path d="M422 142 L590 198" stroke="#ef4444" stroke-width="1.5" opacity="0.4" stroke-dasharray="5 3"/>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🤖 Autocontracts</div>
+      <div class="card-body">
+        <ul>
+          <li>Execute autonomously when triggered by on-chain events</li>
+          <li>Useful for: trading strategies, automated transfers, rebalancing</li>
+          <li>Contracts can pay gas on behalf of users (sponsor model)</li>
+          <li>Enables subscription fee models vs traditional tx taxes</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">💰 Token Supply</div>
+      <div class="card-body">
+        <ul>
+          <li>Max supply: 1,000,000,000 DUSK</li>
+          <li>500M initial + 500M emitted over 36 years</li>
+          <li>Halving every 4 years (Bitcoin-style)</li>
+          <li>Period 1 ends ~2029 — highest emission now</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Emission Schedule Chart -->
+  <h3 style="color:var(--text-muted);font-size:0.95rem;font-weight:600;margin:2rem 0 0.75rem">Emission Schedule — 500M DUSK over 36 Years</h3>
+  <div class="diagram">
+    <svg viewBox="0 0 720 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="DUSK token emission curve: geometric decay over 36 years, halving every 4-year period">
+      <!-- Y axis -->
+      <line x1="70" y1="30" x2="70" y2="230" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <text x="60" y="35" text-anchor="end" font-size="8" fill="#64748b" font-family="Inter,sans-serif">250M</text>
+      <text x="60" y="85" text-anchor="end" font-size="8" fill="#64748b" font-family="Inter,sans-serif">187.5M</text>
+      <text x="60" y="135" text-anchor="end" font-size="8" fill="#64748b" font-family="Inter,sans-serif">125M</text>
+      <text x="60" y="185" text-anchor="end" font-size="8" fill="#64748b" font-family="Inter,sans-serif">62.5M</text>
+      <text x="60" y="232" text-anchor="end" font-size="8" fill="#64748b" font-family="Inter,sans-serif">0</text>
+      <!-- X axis -->
+      <line x1="70" y1="230" x2="690" y2="230" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <!-- Grid lines -->
+      <line x1="70" y1="30" x2="690" y2="30" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="3 3"/>
+      <line x1="70" y1="130" x2="690" y2="130" stroke="rgba(255,255,255,0.04)" stroke-width="0.5" stroke-dasharray="3 3"/>
+      <!-- Period 1: 0-4y -->
+      <rect x="82" y="30" width="58" height="200" rx="4" fill="#8B5CF6" opacity="0.85"/>
+      <text x="111" y="24" text-anchor="middle" font-size="8" fill="#a78bfa" font-weight="600" font-family="Inter,sans-serif">250.5M</text>
+      <text x="111" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">0-4y</text>
+      <!-- Period 2: 4-8y -->
+      <rect x="150" y="130" width="58" height="100" rx="4" fill="#8B5CF6" opacity="0.7"/>
+      <text x="179" y="124" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">125.2M</text>
+      <text x="179" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">4-8y</text>
+      <!-- Period 3: 8-12y -->
+      <rect x="218" y="180" width="58" height="50" rx="4" fill="#8B5CF6" opacity="0.55"/>
+      <text x="247" y="174" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">62.6M</text>
+      <text x="247" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">8-12y</text>
+      <!-- Period 4: 12-16y -->
+      <rect x="286" y="205" width="58" height="25" rx="4" fill="#8B5CF6" opacity="0.42"/>
+      <text x="315" y="200" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">31.3M</text>
+      <text x="315" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">12-16y</text>
+      <!-- Period 5: 16-20y -->
+      <rect x="354" y="218" width="58" height="12" rx="3" fill="#8B5CF6" opacity="0.32"/>
+      <text x="383" y="213" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">15.7M</text>
+      <text x="383" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">16-20y</text>
+      <!-- Period 6: 20-24y -->
+      <rect x="422" y="224" width="58" height="6" rx="2" fill="#8B5CF6" opacity="0.25"/>
+      <text x="451" y="220" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">7.8M</text>
+      <text x="451" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">20-24y</text>
+      <!-- Period 7: 24-28y -->
+      <rect x="490" y="227" width="58" height="3" rx="1" fill="#8B5CF6" opacity="0.2"/>
+      <text x="519" y="223" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">3.9M</text>
+      <text x="519" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">24-28y</text>
+      <!-- Period 8: 28-32y -->
+      <rect x="558" y="228" width="58" height="2" rx="1" fill="#8B5CF6" opacity="0.15"/>
+      <text x="587" y="225" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">2.0M</text>
+      <text x="587" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">28-32y</text>
+      <!-- Period 9: 32-36y -->
+      <rect x="626" y="229" width="58" height="1" rx="0.5" fill="#8B5CF6" opacity="0.1"/>
+      <text x="655" y="226" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">1.0M</text>
+      <text x="655" y="248" text-anchor="middle" font-size="7.5" fill="#64748b" font-family="Inter,sans-serif">32-36y</text>
+      <!-- Decay curve overlay -->
+      <path d="M111,30 L179,130 L247,180 L315,205 L383,218 L451,224 L519,227 L587,228 L655,229" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 3" opacity="0.5"/>
+      <!-- Labels -->
+      <text x="390" y="272" text-anchor="middle" font-size="10" fill="#94a3b8" font-family="Inter,sans-serif">50% reduction every 4-year period &#183; Max supply: 1,000,000,000 DUSK</text>
+      <text x="390" y="288" text-anchor="middle" font-size="9" fill="#64748b" font-family="Inter,sans-serif">Red dashed line: cumulative decay curve</text>
+    </svg>
+  </div>
+
+  <!-- Emission table -->
+  <table class="data-table" style="margin-top:1rem">
+    <thead>
+      <tr><th>Period</th><th>Years</th><th>Emission</th><th>DUSK/Block</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>0–4</td><td>250.48M</td><td>~19.86</td></tr>
+      <tr><td>2</td><td>4–8</td><td>125.24M</td><td>~9.93</td></tr>
+      <tr><td>3</td><td>8–12</td><td>62.62M</td><td>~4.96</td></tr>
+      <tr><td>4</td><td>12–16</td><td>31.31M</td><td>~2.48</td></tr>
+      <tr><td>5</td><td>16–20</td><td>15.65M</td><td>~1.24</td></tr>
+      <tr><td>6</td><td>20–24</td><td>7.83M</td><td>~0.62</td></tr>
+      <tr><td>7</td><td>24–28</td><td>3.91M</td><td>~0.31</td></tr>
+      <tr><td>8</td><td>28–32</td><td>1.95M</td><td>~0.16</td></tr>
+      <tr><td>9</td><td>32–36</td><td>0.98M</td><td>~0.08</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/deep-dive/economic-protocol" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Economic Protocol Docs</a>
+    <a href="https://docs.dusk.network/learn/tokenomics/" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Tokenomics</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 8: COMPARISON
+──────────────────────────────────────────────────── -->
+<section class="section" id="comparison">
+  <div class="section-badge">Section 07 · Key Differentiator</div>
+  <h2 class="section-title">Dusk vs Ethereum</h2>
+  <p class="section-subtitle">Ethereum is a general-purpose platform. Dusk is purpose-built for regulated finance. Not a fork — a ground-up redesign for the institutions that actually need compliance.</p>
+
+  <!-- SVG: Comparison Infographic -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dusk vs Ethereum visual comparison infographic">
+      <!-- ETH side -->
+      <rect x="30" y="20" width="320" height="180" rx="10" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.2)" stroke-width="1.5"/>
+      <text x="190" y="48" fill="#93c5fd" font-family="Inter,sans-serif" font-size="15" font-weight="700" text-anchor="middle">Ξ Ethereum</text>
+      <text x="190" y="65" fill="#64748b" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">General Purpose Layer 1</text>
+      <line x1="50" y1="75" x2="330" y2="75" stroke="rgba(59,130,246,0.15)" stroke-width="1"/>
+      <text x="50" y="94" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Stake: 32 ETH ≈ <tspan id="svg-eth-price">loading...</tspan></text>
+      <text x="50" y="112" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Finality: ~16 minutes</text>
+      <text x="50" y="130" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Privacy: roadmap (Phase 1–5)</text>
+      <text x="50" y="148" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">ZK: L2 rollups only</text>
+      <text x="50" y="166" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">MEV: active extraction</text>
+      <text x="50" y="184" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Compliance: none native</text>
+      <!-- VS divider -->
+      <rect x="362" y="90" width="36" height="36" rx="18" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+      <text x="380" y="113" fill="#a78bfa" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">VS</text>
+      <!-- Dusk side -->
+      <rect x="410" y="20" width="320" height="180" rx="10" fill="rgba(139,92,246,0.06)" stroke="rgba(139,92,246,0.3)" stroke-width="1.5"/>
+      <text x="570" y="48" fill="#a78bfa" font-family="Inter,sans-serif" font-size="15" font-weight="700" text-anchor="middle">◈ Dusk Network</text>
+      <text x="570" y="65" fill="#64748b" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Regulated Finance Layer 1</text>
+      <line x1="430" y1="75" x2="710" y2="75" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
+      <text x="430" y="94" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Stake: 1,000 DUSK ≈ <tspan id="svg-dusk-price">loading...</tspan></text>
+      <text x="430" y="112" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Finality: faster, deterministic</text>
+      <text x="430" y="130" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Privacy: native (Phoenix ZK + Moonlight)</text>
+      <text x="430" y="148" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">ZK: protocol-level PLONK</text>
+      <text x="430" y="166" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">MEV: private execution → no surface</text>
+      <text x="430" y="184" fill="#34d399" font-family="Inter,sans-serif" font-size="10" font-weight="600">Compliance: Citadel ZK-ID + NPEX</text>
+      <!-- Check marks for Dusk advantages -->
+      <text x="700" y="94" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+      <text x="700" y="112" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+      <text x="700" y="130" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+      <text x="700" y="148" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+      <text x="700" y="166" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+      <text x="700" y="184" fill="#34d399" font-family="Inter,sans-serif" font-size="14" text-anchor="middle">✓</text>
+    </svg>
+  </div>
+
+  <!-- Comparison table -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th class="compare-header-eth">Ethereum</th>
+        <th class="compare-header-dusk">Dusk</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Consensus</strong></td>
+        <td class="compare-eth">Gasper (Casper FFG + LMD GHOST)</td>
+        <td class="dusk-cell">Succinct Attestation</td>
+      </tr>
+      <tr>
+        <td><strong>Min Stake</strong></td>
+        <td class="compare-eth">32 ETH (<span id="table-eth-price">~$96,000+</span>)</td>
+        <td class="dusk-cell">1,000 DUSK (<span id="table-dusk-price">~$30</span>)</td>
+      </tr>
+      <tr>
+        <td><strong>Block Time</strong></td>
+        <td class="compare-eth">12s (targeting 2s by 2029)</td>
+        <td class="dusk-cell">~10s DuskDS / ~2s DuskEVM</td>
+      </tr>
+      <tr>
+        <td><strong>Finality</strong></td>
+        <td class="compare-eth">~16 min (targeting 6-16s by 2029)</td>
+        <td class="dusk-cell">Deterministic via SA</td>
+      </tr>
+      <tr>
+        <td><strong>Privacy</strong></td>
+        <td class="compare-eth">Public by default, privacy is multi-phase roadmap</td>
+        <td class="dusk-cell">Native — Phoenix (ZK UTXO) + Moonlight (transparent)</td>
+      </tr>
+      <tr>
+        <td><strong>Transaction Model</strong></td>
+        <td class="compare-eth">Account-based only</td>
+        <td class="dusk-cell">Dual: Phoenix (UTXO/private) + Moonlight (account/public)</td>
+      </tr>
+      <tr>
+        <td><strong>Smart Contracts</strong></td>
+        <td class="compare-eth">Solidity on EVM</td>
+        <td class="dusk-cell">Solidity on DuskEVM + Rust/WASM on DuskVM</td>
+      </tr>
+      <tr>
+        <td><strong>ZK Proofs</strong></td>
+        <td class="compare-eth">L2 rollups only — L1 has none</td>
+        <td class="dusk-cell">Native PLONK at protocol level</td>
+      </tr>
+      <tr>
+        <td><strong>MEV Protection</strong></td>
+        <td class="compare-eth">Transparent mempool → MEV extraction</td>
+        <td class="dusk-cell">Private execution — no surface to front-run</td>
+      </tr>
+      <tr>
+        <td><strong>Compliance</strong></td>
+        <td class="compare-eth">No native compliance tooling</td>
+        <td class="dusk-cell">Citadel ZK-ID, NPEX licensed (MTF, ECSP, Broker)</td>
+      </tr>
+      <tr>
+        <td><strong>Hardware</strong></td>
+        <td class="compare-eth">32 ETH + execution + consensus clients</td>
+        <td class="dusk-cell">2 cores, 4 GB RAM, 1,000 DUSK</td>
+      </tr>
+      <tr>
+        <td><strong>P2P Network</strong></td>
+        <td class="compare-eth">Gossip (libp2p)</td>
+        <td class="dusk-cell">Kadcast — O(log n) structured broadcast</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 6 Advantage Cards -->
+  <div class="compare-advantage-grid">
+    <div class="adv-card">
+      <div class="adv-icon">🔐</div>
+      <div class="adv-title">Privacy by Design</div>
+      <div class="adv-desc">Ethereum's privacy spans 5 roadmap phases over years. Dusk has ZK privacy at the protocol level today.</div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">⚖</div>
+      <div class="adv-title">Regulatory Ready</div>
+      <div class="adv-desc">Licensed under NPEX (MTF, ECSP, Broker, DLT-TSS pending). Citadel ZK identity. Ethereum has no native compliance.</div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🌱</div>
+      <div class="adv-title">Accessible Staking</div>
+      <div class="adv-desc"><span id="card-stake-text">1,000 DUSK vs 32 ETH.</span> A dramatically lower barrier means more validators, better decentralization.</div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">⚡</div>
+      <div class="adv-title">Dual Execution</div>
+      <div class="adv-desc">Solidity (DuskEVM) + privacy Rust/WASM (DuskVM) under one roof with a trustless native bridge.</div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🛡</div>
+      <div class="adv-title">No MEV by Design</div>
+      <div class="adv-desc">Private state execution means nothing to front-run. The transparent mempool problem doesn't exist.</div>
+    </div>
+    <div class="adv-card">
+      <div class="adv-icon">🏦</div>
+      <div class="adv-title">RWA Native</div>
+      <div class="adv-desc">Securities tokenization and compliant DeFi from day one. T-REX (ERC-3643), EMT contracts, OnchainID deployed.</div>
+    </div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/overview" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Dusk Overview Docs</a>
+    <a href="https://ethereum.org/developers/docs/consensus-mechanisms/pos" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Ethereum PoS Docs</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 9: NODE SETUP
+──────────────────────────────────────────────────── -->
+<section class="section" id="node-setup">
+  <div class="section-badge">Section 08</div>
+  <h2 class="section-title">Node Setup Guides</h2>
+  <p class="section-subtitle">Three tracks: standard setup, separated key for security, or USB cold storage with LUKS encryption for maximum protection.</p>
+
+  <!-- Tab switcher (CSS-only) -->
+  <div class="tab-wrap">
+    <input type="radio" name="node-tab" id="tab-standard" class="tab-inputs" checked>
+    <input type="radio" name="node-tab" id="tab-separated" class="tab-inputs">
+    <input type="radio" name="node-tab" id="tab-usb-cold" class="tab-inputs">
+    <div class="tab-labels">
+      <label for="tab-standard" class="tab-label tab-label-standard">Standard Setup</label>
+      <label for="tab-separated" class="tab-label tab-label-separated">Separated Key Setup</label>
+      <label for="tab-usb-cold" class="tab-label tab-label-usb-cold">USB Cold Storage</label>
+    </div>
+
+    <div class="tab-panels">
+      <!-- Panel A: Standard Setup -->
+      <div id="panel-standard">
+        <!-- SVG: Standard Setup Flow -->
+        <div class="diagram">
+          <svg viewBox="0 0 760 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Standard node setup flow: Install, Create Wallet, Export Key, Start Node, Stake">
+            <rect x="20" y="25" width="110" height="50" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+            <text x="75" y="48" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">1. Install</text>
+            <text x="75" y="63" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">node installer</text>
+            <path d="M130 50 L155 50" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aps)"/>
+            <rect x="155" y="25" width="110" height="50" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+            <text x="210" y="48" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">2. Wallet</text>
+            <text x="210" y="63" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">rusk-wallet create</text>
+            <path d="M265 50 L290 50" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aps)"/>
+            <rect x="290" y="25" width="110" height="50" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+            <text x="345" y="48" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">3. Export Key</text>
+            <text x="345" y="63" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">consensus.keys</text>
+            <path d="M400 50 L425 50" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aps)"/>
+            <rect x="425" y="25" width="110" height="50" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+            <text x="480" y="48" fill="white" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">4. Start Node</text>
+            <text x="480" y="63" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">service rusk start</text>
+            <path d="M535 50 L560 50" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#aps)"/>
+            <rect x="560" y="25" width="110" height="50" rx="7" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.4)" stroke-width="1.5"/>
+            <text x="615" y="48" fill="#34d399" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">5. Stake</text>
+            <text x="615" y="63" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">min 1,000 DUSK</text>
+            <defs><marker id="aps" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#8B5CF6"/></marker></defs>
+          </svg>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Standard Setup</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Install Rusk (mainnet)
+curl --proto '=https' --tlsv1.2 -sSfL \
+  https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh \
+  | sudo bash
+
+# Create wallet (save mnemonic securely!)
+rusk-wallet create
+
+# Export consensus key to correct location
+rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+
+# Set consensus key password
+sh /opt/dusk/bin/setup_consensus_pwd.sh
+
+# Fast sync state, then start node
+service rusk stop && download_state && service rusk start
+
+# Monitor sync progress
+tail -F /var/log/rusk.log | grep "block accepted"
+
+# Check block height (compare with explorer)
+ruskquery block-height
+
+# Stake once synced (min 1000 DUSK)
+rusk-wallet stake --amt 1000
+
+# Verify stake
+rusk-wallet stake-info</code></pre>
+        </div>
+        <div class="key-points">
+          <div class="key-points-title">Requirements</div>
+          <div class="key-point"><div class="kp-dot"></div><span>Ubuntu 24.04 LTS x64 — officially supported OS only</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>2 CPU cores, 4 GB RAM, 50 GB SSD, 10 Mbps stable connection</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>Open port <span class="mono">9000/UDP</span> (Kadcast) — required for consensus</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>2-epoch maturity period (~4,320 blocks) before earning rewards</span></div>
+        </div>
+      </div>
+
+      <!-- Panel B: Separated Key Setup -->
+      <div id="panel-separated">
+        <!-- SVG: Separated Key Flow -->
+        <div class="diagram">
+          <svg viewBox="0 0 760 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Separated key setup: cold owner wallet separate from hot node wallet with staking flow">
+            <!-- Owner machine (cold) -->
+            <rect x="20" y="10" width="300" height="90" rx="10" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+            <text x="170" y="32" fill="#34d399" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🔒 Owner Machine (Cold)</text>
+            <text x="170" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">rusk-wallet create → note owner address</text>
+            <text x="170" y="68" fill="#34d399" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">Controls: unstake, withdraw, restake</text>
+            <text x="170" y="86" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Keep offline / hardware wallet</text>
+            <!-- Arrow -->
+            <rect x="340" y="35" width="80" height="30" rx="15" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+            <text x="380" y="55" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">separated</text>
+            <!-- Node machine (hot) -->
+            <rect x="440" y="10" width="300" height="90" rx="10" fill="rgba(239,68,68,0.05)" stroke="rgba(239,68,68,0.25)" stroke-width="1.5"/>
+            <text x="590" y="32" fill="#f87171" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🌐 Node Machine (Hot)</text>
+            <text x="590" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">rusk-wallet create → export consensus.keys</text>
+            <text x="590" y="68" fill="#f87171" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">Controls: block signing only</text>
+            <text x="590" y="86" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Node compromise = no fund loss</text>
+            <!-- Staking flow diagram -->
+            <rect x="80" y="120" width="600" height="85" rx="8" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.15)" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="380" y="138" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">How --owner staking works</text>
+            <!-- Step 1 -->
+            <rect x="100" y="150" width="135" height="40" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.25)" stroke-width="1"/>
+            <text x="167" y="167" fill="#34d399" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">1. Node wallet stakes</text>
+            <text x="167" y="182" fill="#94a3b8" font-family="JetBrains Mono,monospace" font-size="8" text-anchor="middle">stake --amt --owner</text>
+            <path d="M235 170 L270 170" stroke="#8B5CF6" stroke-width="1.2" marker-end="url(#apsk)"/>
+            <!-- Step 2 -->
+            <rect x="270" y="150" width="135" height="40" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+            <text x="337" y="167" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">2. Chain records</text>
+            <text x="337" y="182" fill="#94a3b8" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">consensus → node, owner → you</text>
+            <path d="M405 170 L440 170" stroke="#8B5CF6" stroke-width="1.2" marker-end="url(#apsk)"/>
+            <!-- Step 3 -->
+            <rect x="440" y="150" width="155" height="40" rx="6" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.25)" stroke-width="1"/>
+            <text x="517" y="167" fill="#34d399" font-family="Inter,sans-serif" font-size="9" font-weight="600" text-anchor="middle">3. Only owner can</text>
+            <text x="517" y="182" fill="#94a3b8" font-family="Inter,sans-serif" font-size="8" text-anchor="middle">unstake / withdraw rewards</text>
+            <defs><marker id="apsk" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#8B5CF6"/></marker></defs>
+          </svg>
+        </div>
+
+        <div class="callout" style="background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.2); border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.25rem; font-size:0.82rem; line-height:1.65; color:var(--text-muted);">
+          <strong style="color:var(--purple-light)">How does --owner make this secure?</strong><br>
+          When you run <code>rusk-wallet stake --amt 1000 --owner &lt;owner-address&gt;</code> from the <em>node wallet</em>, you're writing an on-chain record: "this node's consensus key earns rewards, but <strong style="color:#34d399">only the owner address can unstake or withdraw</strong>." The node wallet can only sign consensus messages — if the server is compromised, the attacker cannot move funds. The owner address (your cold/hardware wallet) is the sole key that can call <code>unstake</code> or <code>withdraw</code>. Think of it as: the node is a worker, the owner holds the paycheck.
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 1: Owner Machine (cold/secure)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Create the OWNER wallet on a secure machine (offline preferred)
+rusk-wallet create
+
+# Note your owner address — you'll need it for the staking step
+rusk-wallet addresses
+# Example output: owner address = 27xyK9gR...a1Bk</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 2: Node Machine (server/VPS)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Install Rusk node
+curl --proto '=https' --tlsv1.2 -sSfL \
+  https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh \
+  | sudo bash
+
+# Create a SEPARATE wallet on the node (different mnemonic!)
+rusk-wallet create
+
+# Export consensus key for the node to use
+rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+sh /opt/dusk/bin/setup_consensus_pwd.sh
+
+# Fast sync state, then start node
+service rusk stop && download_state && service rusk start
+
+# Wait for sync — check block height matches explorer
+ruskquery block-height</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 3: Stake with --owner (from node wallet)</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># From the NODE machine, stake with the --owner flag
+# Replace &lt;owner-address&gt; with the address from Step 1
+rusk-wallet stake --amt 1000 --owner &lt;owner-address&gt;
+
+# Verify stake and owner assignment
+rusk-wallet stake-info
+# You should see: owner = &lt;owner-address&gt; (NOT the node address)
+
+# What this means:
+#   Node wallet → signs blocks, earns rewards
+#   Owner wallet → sole key that can unstake or withdraw
+#   Server hacked? → attacker CANNOT touch staked DUSK</code></pre>
+        </div>
+
+        <div class="key-points">
+          <div class="key-points-title">Security Model</div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Node compromised?</strong> Attacker can only sign consensus — cannot unstake, withdraw, or move funds</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Owner key</strong> stays on a hardware wallet, airgapped machine, or secure cold storage</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Two separate mnemonics</strong> — do not use the same mnemonic on both machines</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>To unstake later:</strong> run <span class="mono">rusk-wallet unstake</span> from the owner wallet only</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>Recommended by <a href="https://docs.dusk.network/operator/guides/node-wallet-setup" target="_blank" rel="noopener noreferrer" style="color:var(--purple-light)">Dusk docs</a> for validators with significant stake</span></div>
+        </div>
+      </div>
+
+      <!-- Panel C: USB Cold Storage -->
+      <div id="panel-usb-cold">
+        <!-- SVG: USB Cold Storage Flow -->
+        <div class="diagram">
+          <svg viewBox="0 0 760 250" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="USB cold storage setup: LUKS-encrypted USB holds owner wallet, separate from hot node">
+            <!-- USB Drive -->
+            <rect x="20" y="10" width="220" height="95" rx="10" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+            <text x="130" y="32" fill="#34d399" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">🔐 USB Drive (LUKS)</text>
+            <text x="130" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Encrypted partition</text>
+            <text x="130" y="67" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Contains: owner wallet files</text>
+            <text x="130" y="84" fill="#34d399" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">Lost USB = unreadable without passphrase</text>
+            <text x="130" y="98" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Plug in only when unstaking/withdrawing</text>
+            <!-- Arrow -->
+            <rect x="260" y="35" width="80" height="30" rx="15" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+            <text x="300" y="55" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">airgapped</text>
+            <!-- Secure machine -->
+            <rect x="360" y="10" width="180" height="95" rx="10" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.25)" stroke-width="1.5"/>
+            <text x="450" y="32" fill="#fbbf24" font-family="Inter,sans-serif" font-size="12" font-weight="700" text-anchor="middle">💻 Secure Machine</text>
+            <text x="450" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Mount USB → generate wallet</text>
+            <text x="450" y="67" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">rusk-wallet -w /mnt/dusk</text>
+            <text x="450" y="84" fill="#fbbf24" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">Ideally offline / airgapped</text>
+            <text x="450" y="98" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Wallet never stored on disk</text>
+            <!-- Arrow 2 -->
+            <rect x="560" y="35" width="80" height="30" rx="15" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+            <text x="600" y="55" fill="#a78bfa" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle" font-weight="600">separated</text>
+            <!-- Node -->
+            <rect x="20" y="125" width="720" height="45" rx="8" fill="rgba(239,68,68,0.04)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+            <text x="380" y="147" fill="#f87171" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">🌐 Node Machine (Hot) — separate wallet, consensus.keys only, stakes with --owner &lt;usb-wallet-address&gt;</text>
+            <text x="380" y="163" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">If node is compromised → attacker cannot unstake, withdraw, or access the USB-stored owner key</text>
+            <!-- LUKS benefit flow -->
+            <rect x="80" y="190" width="600" height="50" rx="8" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.15)" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="380" y="210" fill="#34d399" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">Three layers of protection</text>
+            <text x="200" y="230" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">① LUKS encryption on USB</text>
+            <text x="380" y="230" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">② rusk-wallet password</text>
+            <text x="560" y="230" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">③ --owner key separation</text>
+          </svg>
+        </div>
+
+        <div class="callout" style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:1rem 1.25rem; margin-bottom:1.25rem; font-size:0.82rem; line-height:1.65; color:var(--text-muted);">
+          <strong style="color:#34d399">Why USB + LUKS?</strong><br>
+          This is the most secure owner key setup. The wallet is generated directly onto a LUKS-encrypted USB drive — <strong style="color:#34d399">the owner key never exists on any hard drive</strong>. Even if the USB is lost or stolen, the data is encrypted and unreadable without your passphrase. You only plug it in when you need to unstake or withdraw rewards.
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 1: Prepare the LUKS-encrypted USB</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Insert USB drive and identify it (usually /dev/sdb or /dev/sdc)
+lsblk
+# IMPORTANT: Replace /dev/sdX with YOUR device — this ERASES the drive
+
+# Install cryptsetup if not present
+sudo apt update && sudo apt install -y cryptsetup
+
+# Wipe and create a LUKS-encrypted partition
+# You will be asked to set a strong passphrase — DO NOT FORGET IT
+sudo cryptsetup luksFormat /dev/sdX1
+
+# Open the encrypted partition (you'll enter the passphrase)
+sudo cryptsetup open /dev/sdX1 dusk-cold
+
+# Format the decrypted volume with ext4
+sudo mkfs.ext4 /dev/mapper/dusk-cold
+
+# Create a mount point and mount
+sudo mkdir -p /mnt/dusk-cold
+sudo mount /dev/mapper/dusk-cold /mnt/dusk-cold
+
+# Set permissions so your user can write
+sudo chown $(whoami):$(whoami) /mnt/dusk-cold</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 2: Generate owner wallet onto USB</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Create the owner wallet DIRECTLY on the encrypted USB
+# The -w flag tells rusk-wallet to use a custom directory
+rusk-wallet create -w /mnt/dusk-cold/wallet
+
+# Save your mnemonic phrase on paper (NOT digitally)
+# This mnemonic + the USB are your only recovery paths
+
+# Get the owner address — write this down, you need it for staking
+rusk-wallet -w /mnt/dusk-cold/wallet addresses
+# Example output: owner address = 27xyK9gR...a1Bk
+
+# Verify the wallet files exist only on the USB
+ls -la /mnt/dusk-cold/wallet/
+# Should show .dat wallet files</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 3: Safely unmount and eject</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># Unmount the drive
+sudo umount /mnt/dusk-cold
+
+# Close the LUKS encryption layer
+sudo cryptsetup close dusk-cold
+
+# Physically remove the USB drive
+# Store it in a safe place (fireproof safe, safety deposit box, etc.)</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Step 4: Set up node + stake with --owner</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># === ON NODE MACHINE (server/VPS) ===
+# Install Rusk node
+curl --proto '=https' --tlsv1.2 -sSfL \
+  https://github.com/dusk-network/node-installer/releases/latest/download/node-installer.sh \
+  | sudo bash
+
+# Create a SEPARATE node wallet (different mnemonic from USB!)
+rusk-wallet create
+
+# Export consensus key
+rusk-wallet export -d /opt/dusk/conf -n consensus.keys
+sh /opt/dusk/bin/setup_consensus_pwd.sh
+
+# Sync and start
+service rusk stop && download_state && service rusk start
+ruskquery block-height  # Wait for sync
+
+# Stake using the owner address from your USB wallet
+# Replace &lt;owner-address&gt; with the address from Step 2
+rusk-wallet stake --amt 1000 --owner &lt;owner-address&gt;
+
+# Verify: owner should show the USB wallet address
+rusk-wallet stake-info</code></pre>
+        </div>
+
+        <div class="code-block-wrap">
+          <div class="code-block-header"><span class="code-lang">bash — Later: Accessing USB wallet to unstake/withdraw</span><button class="copy-btn">Copy</button></div>
+          <pre><code class="language-bash"># When you need to unstake or withdraw rewards:
+# Insert the USB drive
+sudo cryptsetup open /dev/sdX1 dusk-cold
+sudo mount /dev/mapper/dusk-cold /mnt/dusk-cold
+
+# Unstake or withdraw using the USB wallet
+rusk-wallet -w /mnt/dusk-cold/wallet unstake
+rusk-wallet -w /mnt/dusk-cold/wallet withdraw
+
+# Close up when done
+sudo umount /mnt/dusk-cold
+sudo cryptsetup close dusk-cold
+# Remove USB and store safely</code></pre>
+        </div>
+
+        <div class="key-points">
+          <div class="key-points-title">Security Model</div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Three-layer protection:</strong> LUKS drive encryption + rusk-wallet password + --owner key separation</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>USB lost or stolen?</strong> Data is LUKS-encrypted — unreadable without your passphrase</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Node compromised?</strong> Attacker has no access to the USB wallet — cannot unstake or withdraw</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Key never on disk:</strong> owner wallet exists only on the USB — no trace left on any machine</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span><strong>Backup your mnemonic on paper</strong> — if the USB dies, the mnemonic is your recovery path</span></div>
+          <div class="key-point"><div class="kp-dot"></div><span>Use <span class="mono">/dev/sdX1</span> carefully — <code>lsblk</code> confirms the correct device before formatting</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/operator/provisioner" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Provisioner Guide</a>
+    <a href="https://docs.dusk.network/operator/guides/node-wallet-setup" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Node Wallet Setup</a>
+    <a href="https://github.com/dusk-network/node-installer" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Node Installer</a>
+    <a href="https://docs.dusk.network/learn/rusk-wallet/" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Rusk Wallet CLI</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 10: SMART CONTRACTS
+──────────────────────────────────────────────────── -->
+<section class="section" id="smart-contracts">
+  <div class="section-badge">Section 09</div>
+  <h2 class="section-title">Smart Contract Development</h2>
+  <p class="section-subtitle">Two parallel paths: Solidity on DuskEVM for EVM-standard contracts, or Rust/WASM on DuskVM for privacy-native contracts.</p>
+
+  <!-- SVG: Smart Contract Development Paths -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Smart contract development paths: Rust to WASM to DuskVM, and Solidity to EVM to DuskEVM">
+      <!-- DuskVM path (top) -->
+      <text x="380" y="20" fill="#64748b" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Both paths can interact via native bridge</text>
+      <rect x="20" y="35" width="100" height="45" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+      <text x="70" y="55" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Rust</text>
+      <text x="70" y="72" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">#[contract]</text>
+      <path d="M120 58 L150 58" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#apsc)"/>
+      <rect x="150" y="35" width="100" height="45" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+      <text x="200" y="55" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">WASM</text>
+      <text x="200" y="72" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">make wasm</text>
+      <path d="M250 58 L280 58" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#apsc)"/>
+      <rect x="280" y="35" width="110" height="45" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+      <text x="335" y="55" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">rusk-wallet</text>
+      <text x="335" y="72" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">contract-deploy</text>
+      <path d="M390 58 L420 58" stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#apsc)"/>
+      <rect x="420" y="20" width="140" height="80" rx="8" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="490" y="52" fill="#a78bfa" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">DuskVM</text>
+      <text x="490" y="68" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Piecrust WASM VM</text>
+      <text x="490" y="82" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">ZK-native · Privacy</text>
+      <!-- DuskEVM path (bottom) -->
+      <rect x="20" y="120" width="100" height="45" rx="7" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
+      <text x="70" y="140" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Solidity</text>
+      <text x="70" y="157" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">standard EVM</text>
+      <path d="M120 143 L150 143" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#apsc2)"/>
+      <rect x="150" y="120" width="100" height="45" rx="7" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
+      <text x="200" y="140" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Compile</text>
+      <text x="200" y="157" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Hardhat/Foundry</text>
+      <path d="M250 143 L280 143" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#apsc2)"/>
+      <rect x="280" y="120" width="110" height="45" rx="7" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.4)" stroke-width="1.5"/>
+      <text x="335" y="140" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Deploy</text>
+      <text x="335" y="157" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">npx hardhat deploy</text>
+      <path d="M390 143 L420 143" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#apsc2)"/>
+      <rect x="420" y="105" width="140" height="80" rx="8" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="1.5"/>
+      <text x="490" y="137" fill="#93c5fd" font-family="Inter,sans-serif" font-size="13" font-weight="700" text-anchor="middle">DuskEVM</text>
+      <text x="490" y="153" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">OP Stack EVM</text>
+      <text x="490" y="167" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">MetaMask compatible</text>
+      <!-- Bridge arrow -->
+      <path d="M560 100 L620 100" stroke="#8B5CF6" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.5"/>
+      <rect x="620" y="75" width="120" height="50" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+      <text x="680" y="98" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" text-anchor="middle" font-weight="600">Native Bridge</text>
+      <text x="680" y="113" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">cross-layer calls</text>
+      <defs>
+        <marker id="apsc" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#8B5CF6"/></marker>
+        <marker id="apsc2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#3b82f6"/></marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">🦀 DuskVM Path (Rust)</div>
+      <div class="card-body">
+        <ul>
+          <li>Use Forge framework — <span class="mono">#[contract]</span> macro</li>
+          <li>Target: <span class="mono">wasm32-unknown-unknown</span></li>
+          <li>State as ordinary Rust structs (no key-value store)</li>
+          <li>Native ZK host functions: <span class="mono">verify_plonk</span>, <span class="mono">verify_bls</span></li>
+          <li>Deploy via <span class="mono">rusk-wallet contract-deploy</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">⚡ DuskEVM Path (Solidity)</div>
+      <div class="card-body">
+        <ul>
+          <li>Standard Solidity 0.8.x — no modifications needed</li>
+          <li>OpenZeppelin, ERC20/ERC721/ERC4626 all work</li>
+          <li>T-REX (ERC-3643) security tokens deployed and live</li>
+          <li>OnchainID (ERC734/ERC735) for KYC identity</li>
+          <li>Verify contracts on Blockscout explorer</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block-wrap">
+    <div class="code-block-header"><span class="code-lang">rust — DuskVM contract (Forge)</span><button class="copy-btn">Copy</button></div>
+    <pre><code class="language-rust">#![no_std]
+#![cfg(target_family = "wasm")]
+extern crate alloc;
+
+use dusk_forge::contract;
+
+#[contract]
+mod counter {
+    use dusk_core::abi;
+
+    pub struct Counter { value: i64 }
+
+    impl Counter {
+        pub const fn new() -> Self { Self { value: 0 } }
+
+        pub fn read_value(&self) -> i64 { self.value }
+
+        pub fn increment(&mut self) {
+            self.value += 1;
+            abi::emit("incremented", self.value);
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://github.com/dusk-network/piecrust" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Piecrust VM</a>
+    <a href="https://github.com/dusk-network/forge" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ Forge Framework</a>
+    <a href="https://docs.dusk.network/learn/deep-dive/dusk-evm" target="_blank" rel="noopener noreferrer" class="doc-link">📄 DuskEVM Docs</a>
+    <a href="https://github.com/dusk-network/my-first-contract" target="_blank" rel="noopener noreferrer" class="doc-link">⚙ First Contract Example</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 11: WALLET & KEYS
+──────────────────────────────────────────────────── -->
+<section class="section" id="wallet">
+  <div class="section-badge">Section 10</div>
+  <h2 class="section-title">Wallet &amp; Key Management</h2>
+  <p class="section-subtitle">The rusk-wallet CLI manages DUSK, staking, smart contracts, and the Phoenix/Moonlight conversion in one tool.</p>
+
+  <!-- SVG: Key hierarchy -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Key hierarchy: mnemonic to BLS key pair to consensus key and owner key, with Phoenix and Moonlight paths">
+      <!-- Mnemonic -->
+      <rect x="290" y="15" width="180" height="44" rx="7" fill="rgba(139,92,246,0.2)" stroke="#8B5CF6" stroke-width="1.5"/>
+      <text x="380" y="34" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">Mnemonic Phrase</text>
+      <text x="380" y="50" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">12-word recovery phrase</text>
+      <!-- BLS Key Pair -->
+      <path d="M380 59 L380 83" stroke="#8B5CF6" stroke-width="1.5" opacity="0.5"/>
+      <rect x="270" y="83" width="220" height="44" rx="7" fill="rgba(139,92,246,0.15)" stroke="rgba(139,92,246,0.4)" stroke-width="1.5"/>
+      <text x="380" y="102" fill="white" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">BLS Key Pair (BLS12-381)</text>
+      <text x="380" y="118" fill="#94a3b8" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">96-byte public key · 32-byte secret key</text>
+      <!-- Consensus Key branch -->
+      <path d="M310 127 L200 155" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4"/>
+      <rect x="80" y="155" width="140" height="35" rx="6" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.3)" stroke-width="1"/>
+      <text x="150" y="171" fill="#f87171" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">Consensus Key</text>
+      <text x="150" y="183" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Hot · Signs blocks · consensus.keys</text>
+      <!-- Owner Key branch -->
+      <path d="M380 127 L380 155" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4"/>
+      <rect x="295" y="155" width="170" height="35" rx="6" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+      <text x="380" y="171" fill="#34d399" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">Owner Key</text>
+      <text x="380" y="183" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Controls: unstake · withdraw rewards</text>
+      <!-- Phoenix branch -->
+      <path d="M450 127 L560 155" stroke="#8B5CF6" stroke-width="1.5" opacity="0.4"/>
+      <rect x="490" y="155" width="130" height="35" rx="6" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+      <text x="555" y="171" fill="#a78bfa" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">Phoenix Address</text>
+      <text x="555" y="183" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Secret · View · Stealth addrs</text>
+      <!-- Moonlight branch -->
+      <path d="M480 127 L665 155" stroke="#3b82f6" stroke-width="1.5" opacity="0.4"/>
+      <rect x="640" y="155" width="100" height="35" rx="6" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
+      <text x="690" y="171" fill="#93c5fd" font-family="Inter,sans-serif" font-size="10" font-weight="600" text-anchor="middle">Moonlight Acct</text>
+      <text x="690" y="183" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Public address</text>
+    </svg>
+  </div>
+
+  <table class="data-table">
+    <thead><tr><th>Command</th><th>What It Does</th></tr></thead>
+    <tbody>
+      <tr><td><span class="mono">rusk-wallet create</span></td><td>Create a new wallet, generates 12-word mnemonic — back it up immediately</td></tr>
+      <tr><td><span class="mono">rusk-wallet restore</span></td><td>Restore from mnemonic — enter all words in <strong>lowercase</strong></td></tr>
+      <tr><td><span class="mono">rusk-wallet balance</span></td><td>Show DUSK balance (all accounts)</td></tr>
+      <tr><td><span class="mono">rusk-wallet stake --amt 1000</span></td><td>Stake 1,000 DUSK (minimum)</td></tr>
+      <tr><td><span class="mono">rusk-wallet stake-info</span></td><td>View current stake, maturity, rewards</td></tr>
+      <tr><td><span class="mono">rusk-wallet withdraw</span></td><td>Withdraw accumulated staking rewards</td></tr>
+      <tr><td><span class="mono">rusk-wallet unstake</span></td><td>Unstake — no waiting period, no penalty</td></tr>
+      <tr><td><span class="mono">rusk-wallet shield --amt 100</span></td><td>Convert public (Moonlight) → shielded (Phoenix)</td></tr>
+      <tr><td><span class="mono">rusk-wallet unshield --amt 100</span></td><td>Convert shielded (Phoenix) → public (Moonlight)</td></tr>
+      <tr><td><span class="mono">rusk-wallet export -d /opt/dusk/conf -n consensus.keys</span></td><td>Export BLS consensus key to node directory</td></tr>
+      <tr><td><span class="mono">rusk-wallet contract-deploy --bytecode ./my.wasm</span></td><td>Deploy a smart contract to DuskVM</td></tr>
+    </tbody>
+  </table>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/learn/rusk-wallet" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Rusk Wallet Reference</a>
+    <a href="https://docs.dusk.network/operator/guides/node-wallet-setup" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Node Wallet Setup Guide</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 12: MAINTENANCE & SECURITY
+──────────────────────────────────────────────────── -->
+<section class="section" id="maintenance">
+  <div class="section-badge">Section 11</div>
+  <h2 class="section-title">Node Maintenance &amp; Security</h2>
+  <p class="section-subtitle">Keep your node healthy to avoid slashing. Know the difference between soft (recoverable) and hard (burned) slashing.</p>
+
+  <!-- SVG: Sentry Node Security Architecture -->
+  <div class="diagram">
+    <svg viewBox="0 0 760 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sentry node security architecture showing validator behind sentry nodes">
+      <!-- Internet / Public Network -->
+      <rect x="580" y="20" width="160" height="160" rx="10" fill="rgba(239,68,68,0.05)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+      <text x="660" y="45" fill="#f87171" font-family="Inter,sans-serif" font-size="11" font-weight="600" text-anchor="middle">Public Network</text>
+      <circle cx="635" cy="80" r="16" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+      <text x="635" y="84" fill="#f87171" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">peer</text>
+      <circle cx="685" cy="80" r="16" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+      <text x="685" y="84" fill="#f87171" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">peer</text>
+      <circle cx="635" cy="130" r="16" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+      <text x="635" y="134" fill="#f87171" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">DoS?</text>
+      <circle cx="685" cy="130" r="16" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+      <text x="685" y="134" fill="#f87171" font-family="Inter,sans-serif" font-size="8.5" text-anchor="middle">scan</text>
+      <!-- Sentry Nodes -->
+      <rect x="310" y="40" width="220" height="120" rx="8" fill="rgba(245,158,11,0.06)" stroke="rgba(245,158,11,0.25)" stroke-width="1.5"/>
+      <text x="420" y="60" fill="#fbbf24" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">Sentry Nodes</text>
+      <text x="420" y="76" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Public-facing, known addresses</text>
+      <rect x="330" y="88" width="80" height="32" rx="5" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
+      <text x="370" y="108" fill="#fbbf24" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Sentry A</text>
+      <rect x="420" y="88" width="80" height="32" rx="5" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
+      <text x="460" y="108" fill="#fbbf24" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Sentry B</text>
+      <text x="420" y="148" fill="#64748b" font-family="Inter,sans-serif" font-size="9" text-anchor="middle">Filter traffic · relay consensus msgs</text>
+      <!-- Validator -->
+      <rect x="50" y="60" width="210" height="80" rx="8" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.25)" stroke-width="1.5"/>
+      <text x="155" y="82" fill="#34d399" font-family="Inter,sans-serif" font-size="11" font-weight="700" text-anchor="middle">🔒 Validator Node</text>
+      <text x="155" y="99" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Private IP · consensus.keys</text>
+      <text x="155" y="115" fill="#64748b" font-family="Inter,sans-serif" font-size="9.5" text-anchor="middle">Only connects to sentries</text>
+      <text x="155" y="130" fill="#34d399" font-family="Inter,sans-serif" font-size="9" text-anchor="middle" font-weight="600">Not directly internet-exposed</text>
+      <!-- Arrows -->
+      <path d="M260 100 L308 100" stroke="#f59e0b" stroke-width="1.5" opacity="0.5" stroke-dasharray="4 2"/>
+      <path d="M530 100 L578 100" stroke="#ef4444" stroke-width="1.5" opacity="0.5" stroke-dasharray="4 2"/>
+    </svg>
+  </div>
+
+  <div class="content-grid">
+    <div class="content-card">
+      <div class="card-title">⚠ Soft Slashing (Recoverable)</div>
+      <div class="card-body">
+        <ul>
+          <li>Triggered: missed block production (offline/slow)</li>
+          <li>1st offense: warning only, no stake loss</li>
+          <li>2nd+: N×10% moved to claimable rewards</li>
+          <li>Suspended N epochs per consecutive fault</li>
+          <li><strong>Recoverable</strong>: withdraw and restake</li>
+          <li>Faults reset on next reward earned</li>
+        </ul>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title">🔥 Hard Slashing (Burned)</div>
+      <div class="card-body">
+        <ul>
+          <li>Invalid block production: 10% burned</li>
+          <li>Double voting (equivocation): 20% burned</li>
+          <li>Double block production: 20% burned</li>
+          <li><strong>Permanently destroyed</strong> — no recovery</li>
+          <li>Prevention: <strong>never run two nodes with same consensus.keys</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block-wrap">
+    <div class="code-block-header"><span class="code-lang">bash — Monitoring Commands</span><button class="copy-btn">Copy</button></div>
+    <pre><code class="language-bash"># Service status
+service rusk status
+
+# Live block acceptance (healthy node shows frequent output)
+tail -F /var/log/rusk.log | grep "block accepted"
+
+# Current block height (compare with explorer.dusk.network)
+ruskquery block-height
+
+# Stake status
+rusk-wallet stake-info
+
+# Port check — 9000/UDP must be open
+ss -ulnp | grep 9000
+
+# Node stuck? Fast resync:
+service rusk stop && download_state && service rusk restart</code></pre>
+  </div>
+
+  <div class="doc-links">
+    <a href="https://docs.dusk.network/operator/maintenance-monitoring" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Maintenance &amp; Monitoring</a>
+    <a href="https://dusk.network/news/slashing-finalized" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Slashing Mechanism</a>
+    <a href="https://docs.dusk.network/operator/troubleshooting/" target="_blank" rel="noopener noreferrer" class="doc-link">📄 Troubleshooting</a>
+  </div>
+</section>
+
+<!-- ────────────────────────────────────────────────────
+  SECTION 13: RESOURCES
+──────────────────────────────────────────────────── -->
+
+<section class="section" id="ecosystem">
+  <div class="section-badge">Section 12</div>
+  <h2 class="section-title">Ecosystem &amp; Community Projects</h2>
+  <p class="section-subtitle">Live projects, integrations, and developer tools built on or partnered with Dusk Network.</p>
+
+  <!-- ── SVG: Ecosystem Map ── -->
+  <div style="margin:1.5rem 0">
+    <svg viewBox="0 0 700 340" role="img" aria-label="Dusk ecosystem map showing regulated markets, privacy infrastructure, developer tools, and cross-chain integrations" style="width:100%;max-width:700px;margin:0 auto;display:block">
+      <!-- Background -->
+      <rect width="700" height="340" rx="12" fill="#1a1a2e"/>
+      <!-- Center hub -->
+      <circle cx="350" cy="170" r="42" fill="#6D28D9" opacity="0.25"/>
+      <circle cx="350" cy="170" r="28" fill="#8B5CF6" opacity="0.4"/>
+      <text x="350" y="166" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700" font-family="Inter,sans-serif">DUSK</text>
+      <text x="350" y="180" text-anchor="middle" fill="#a78bfa" font-size="7" font-family="Inter,sans-serif">Network</text>
+
+      <!-- Category: Regulated Markets (top-left) -->
+      <text x="90" y="28" text-anchor="middle" fill="#8B5CF6" font-size="8" font-weight="600" font-family="Inter,sans-serif" text-transform="uppercase" letter-spacing="1">REGULATED MARKETS</text>
+      <line x1="155" y1="28" x2="295" y2="145" stroke="#8B5CF6" stroke-width="0.7" opacity="0.3" stroke-dasharray="3,3"/>
+      <!-- NPEX -->
+      <rect x="20" y="42" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#8B5CF6" stroke-width="0.6" opacity="0.8"/>
+      <text x="90" y="60" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">NPEX</text>
+      <text x="90" y="74" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Dutch MTF · Tokenized Securities</text>
+      <!-- STOX -->
+      <rect x="20" y="92" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#8B5CF6" stroke-width="0.6" opacity="0.8"/>
+      <text x="90" y="110" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">STOX</text>
+      <text x="90" y="124" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Dusk Trading Platform · DuskEVM</text>
+      <!-- 21X -->
+      <rect x="20" y="142" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#8B5CF6" stroke-width="0.6" opacity="0.8"/>
+      <text x="90" y="160" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">21X</text>
+      <text x="90" y="174" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Frankfurt DLT Pilot Regime</text>
+
+      <!-- Category: Privacy & Identity (top-right) -->
+      <text x="610" y="28" text-anchor="middle" fill="#10b981" font-size="8" font-weight="600" font-family="Inter,sans-serif" text-transform="uppercase" letter-spacing="1">PRIVACY &amp; IDENTITY</text>
+      <line x1="545" y1="28" x2="405" y2="145" stroke="#10b981" stroke-width="0.7" opacity="0.3" stroke-dasharray="3,3"/>
+      <!-- Citadel -->
+      <rect x="540" y="42" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#10b981" stroke-width="0.6" opacity="0.8"/>
+      <text x="610" y="60" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">Citadel SSI</text>
+      <text x="610" y="74" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Private KYC · ZK Identity</text>
+      <!-- Hedger -->
+      <rect x="540" y="92" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#10b981" stroke-width="0.6" opacity="0.8"/>
+      <text x="610" y="110" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">Hedger</text>
+      <text x="610" y="124" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">HE + ZK Privacy Engine</text>
+      <!-- EURQ -->
+      <rect x="540" y="142" width="140" height="44" rx="6" fill="#0d1b2a" stroke="#10b981" stroke-width="0.6" opacity="0.8"/>
+      <text x="610" y="160" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">EURQ (Quantoz)</text>
+      <text x="610" y="174" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">MiCA-Compliant Stablecoin</text>
+
+      <!-- Category: Developer Tools (bottom-left) -->
+      <text x="120" y="225" text-anchor="middle" fill="#f59e0b" font-size="8" font-weight="600" font-family="Inter,sans-serif" text-transform="uppercase" letter-spacing="1">DEV TOOLS &amp; SDKs</text>
+      <line x1="185" y1="220" x2="310" y2="185" stroke="#f59e0b" stroke-width="0.7" opacity="0.3" stroke-dasharray="3,3"/>
+      <!-- w3sper -->
+      <rect x="20" y="238" width="140" height="38" rx="6" fill="#0d1b2a" stroke="#f59e0b" stroke-width="0.6" opacity="0.8"/>
+      <text x="90" y="254" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">w3sper.js</text>
+      <text x="90" y="266" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">JS/TS SDK · dApp Integration</text>
+      <!-- Moat -->
+      <rect x="20" y="282" width="140" height="38" rx="6" fill="#0d1b2a" stroke="#f59e0b" stroke-width="0.6" opacity="0.8"/>
+      <text x="90" y="298" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">Moat SDK</text>
+      <text x="90" y="310" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Citadel Integration Toolkit</text>
+
+      <!-- Category: Infrastructure (bottom-right) -->
+      <text x="580" y="225" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="600" font-family="Inter,sans-serif" text-transform="uppercase" letter-spacing="1">INFRASTRUCTURE</text>
+      <line x1="515" y1="220" x2="390" y2="185" stroke="#ef4444" stroke-width="0.7" opacity="0.3" stroke-dasharray="3,3"/>
+      <!-- Chainlink -->
+      <rect x="540" y="238" width="140" height="38" rx="6" fill="#0d1b2a" stroke="#ef4444" stroke-width="0.6" opacity="0.8"/>
+      <text x="610" y="254" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">Chainlink</text>
+      <text x="610" y="266" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">CCIP · DataLink · Data Streams</text>
+      <!-- Cordial -->
+      <rect x="540" y="282" width="140" height="38" rx="6" fill="#0d1b2a" stroke="#ef4444" stroke-width="0.6" opacity="0.8"/>
+      <text x="610" y="298" text-anchor="middle" fill="#e2e8f0" font-size="9" font-weight="600" font-family="Inter,sans-serif">Cordial Systems</text>
+      <text x="610" y="310" text-anchor="middle" fill="#94a3b8" font-size="6.5" font-family="Inter,sans-serif">Institutional Custody</text>
+
+      <!-- Center cluster labels -->
+      <rect x="260" y="230" width="180" height="34" rx="6" fill="#0d1b2a" stroke="rgba(139,92,246,0.3)" stroke-width="0.6"/>
+      <text x="350" y="244" text-anchor="middle" fill="#a78bfa" font-size="7" font-weight="600" font-family="Inter,sans-serif">CORE APPS</text>
+      <text x="350" y="256" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="Inter,sans-serif">Web Wallet · Block Explorer · BSC Bridge</text>
+      <line x1="350" y1="212" x2="350" y2="230" stroke="rgba(139,92,246,0.3)" stroke-width="0.7" stroke-dasharray="3,3"/>
+
+      <!-- Thesan Fund -->
+      <rect x="275" y="280" width="150" height="34" rx="6" fill="#0d1b2a" stroke="rgba(139,92,246,0.3)" stroke-width="0.6"/>
+      <text x="350" y="294" text-anchor="middle" fill="#a78bfa" font-size="7" font-weight="600" font-family="Inter,sans-serif">THESAN DEV FUND</text>
+      <text x="350" y="306" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="Inter,sans-serif">15M DUSK · Ecosystem Grants</text>
+    </svg>
+  </div>
+
+  <!-- ── Regulated Markets ── -->
+  <div class="eco-category">
+    <div class="eco-category-label">Regulated Markets</div>
+    <div class="eco-grid">
+      <a href="https://dusk.network/news/dusk-and-npex-partnership" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">NPEX</span><span class="eco-badge">Live</span></div>
+        <div class="eco-card-desc">Dutch-licensed stock exchange (MTF) building Europe&rsquo;s first blockchain-powered securities market on Dusk. Over &euro;200M raised, 17,500+ active investors. Issues and trades tokenized equities on-chain.</div>
+        <div class="eco-card-url">dusk.network/news/dusk-and-npex-partnership</div>
+      </a>
+      <a href="https://dusk.network/news/3-keys-success" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">STOX</span><span class="eco-badge yellow">Building</span></div>
+        <div class="eco-card-desc">Dusk&rsquo;s own trading platform on DuskEVM. Regulated assets &mdash; money-market funds, stocks, bonds &mdash; directly to users. Works alongside NPEX broker license for compliance.</div>
+        <div class="eco-card-url">dusk.network/news/3-keys-success</div>
+      </a>
+      <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">21X</span><span class="eco-badge yellow">Building</span></div>
+        <div class="eco-card-desc">Frankfurt-based DLT Pilot Regime securities market. One of the first to receive EU permission for blockchain-based trading and settlement. Planning Dusk as a supported chain.</div>
+        <div class="eco-card-url">dusk.network/news/multilayer-evolution</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Privacy & Compliance ── -->
+  <div class="eco-category">
+    <div class="eco-category-label">Privacy &amp; Compliance</div>
+    <div class="eco-grid">
+      <a href="https://dusk.network/news/hedger-confidential-duskevm" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Hedger</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Privacy engine for DuskEVM. Combines homomorphic encryption (ElGamal) + ZK proofs for confidential EVM transactions. In-browser proving &lt;2s. Successor to Zedger.</div>
+        <div class="eco-card-url">dusk.network/news/hedger-confidential-duskevm</div>
+      </a>
+      <a href="https://docs.dusk.network/developer/digital-identity/protocol/" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Citadel SSI</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Self-Sovereign Identity protocol using ZK proofs. Prove KYC attributes (e.g. &ldquo;over 18&rdquo;) without revealing personal data. Private NFT-based license model on-chain.</div>
+        <div class="eco-card-url">docs.dusk.network/developer/digital-identity/protocol</div>
+      </a>
+      <a href="https://www.quantoz.com/products/eurq-usdq" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">EURQ &amp; USDQ</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Quantoz MiCA-compliant euro &amp; USD stablecoins (EMTs). 102% overcollateralized. Licensed by Dutch Central Bank. Powers DuskPay on-chain payments.</div>
+        <div class="eco-card-url">quantoz.com/products/eurq-usdq</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Cross-Chain & Infrastructure ── -->
+  <div class="eco-category">
+    <div class="eco-category-label">Cross-Chain &amp; Infrastructure</div>
+    <div class="eco-grid">
+      <a href="https://finance.yahoo.com/news/dusk-npex-adopt-chainlink-interoperability-130000457.html" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Chainlink Integration</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">CCIP for cross-chain tokenized assets (Ethereum, Solana). DataLink for NPEX market data on-chain. Data Streams for real-time pricing feeds. Cross-Chain Token standard for DUSK.</div>
+        <div class="eco-card-url">finance.yahoo.com &middot; Chainlink + Dusk + NPEX</div>
+      </a>
+      <a href="https://dusk.network" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Cordial Systems</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Institutional-grade custody via Cordial Treasury. Self-custody without third-party custodians &mdash; banks and institutions retain direct key control over tokenized assets.</div>
+        <div class="eco-card-url">Cordial Treasury &middot; Institutional Custody</div>
+      </a>
+      <a href="https://docs.dusk.network" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">BSC Bridge</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Bidirectional bridge between native DUSK and BNB Smart Chain (BEP-20). Enables migration from ERC-20/BEP-20 legacy tokens to mainnet DUSK.</div>
+        <div class="eco-card-url">docs.dusk.network &middot; Bridge</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Developer Tools ── -->
+  <div class="eco-category">
+    <div class="eco-category-label">Developer Tools &amp; SDKs</div>
+    <div class="eco-grid">
+      <a href="https://jsr.io/@dusk/w3sper" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">w3sper.js</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">JavaScript/TypeScript SDK for dApp development. Address management, offline tx signing, event subscriptions, contract queries, and proof delegation.</div>
+        <div class="eco-card-url">jsr.io/@dusk/w3sper</div>
+      </a>
+      <a href="https://docs.dusk.network/developer/digital-identity/integration/" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Moat SDK</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Citadel integration toolkit &mdash; CLI + API for SSI license requests, issuance, and verification. Enables apps to add private identity flows using Dusk&rsquo;s on-chain Citadel contracts.</div>
+        <div class="eco-card-url">docs.dusk.network &middot; Moat Integration</div>
+      </a>
+      <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">dusk-deploy-cli</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">CLI tool for deploying third-party smart contracts on Dusk. Requires only a seed phrase, contract binary, config file, and owner hex string.</div>
+        <div class="eco-card-url">github.com/dusk-network/rusk</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Core Apps & Funding ── -->
+  <div class="eco-category">
+    <div class="eco-category-label">Core Apps &amp; Ecosystem Fund</div>
+    <div class="eco-grid">
+      <a href="https://wallet.dusk.network" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Dusk Web Wallet</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">Browser-based wallet with Phoenix (private) &amp; Moonlight (transparent) support. Staking, shield/unshield, and EVM migration built in.</div>
+        <div class="eco-card-url">wallet.dusk.network</div>
+      </a>
+      <a href="https://explorer.dusk.network" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Block Explorer</span><span class="eco-badge green">Live</span></div>
+        <div class="eco-card-desc">DuskDS mainnet explorer &mdash; blocks, transactions, validators, and staking info. Separate EVM explorer at explorer.evm.dusk.network.</div>
+        <div class="eco-card-url">explorer.dusk.network</div>
+      </a>
+      <a href="https://dusk.network" target="_blank" rel="noopener noreferrer" class="eco-card">
+        <div class="eco-card-head"><span class="eco-card-title">Thesan Development Fund</span><span class="eco-badge">Active</span></div>
+        <div class="eco-card-desc">15 million DUSK allocated for ecosystem grants, developer incentives, and community projects. Funds protocol development and third-party integrations.</div>
+        <div class="eco-card-url">dusk.network &middot; Thesan Fund</div>
+      </a>
+    </div>
+  </div>
+
+</section>
+
+<section class="section" id="resources" style="border-bottom:none">
+  <div class="section-badge">Section 13</div>
+  <h2 class="section-title">Resources &amp; Links</h2>
+  <p class="section-subtitle">Official documentation, GitHub repositories, block explorers, and community channels.</p>
+
+  <div class="resources-grid">
+    <a href="https://docs.dusk.network" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">📄</div>
+      <div class="resource-title">Official Documentation</div>
+      <div class="resource-desc">Complete protocol docs — learn, develop, operate</div>
+      <div class="resource-url">docs.dusk.network</div>
+    </a>
+    <a href="https://github.com/dusk-network" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">⚙</div>
+      <div class="resource-title">GitHub Organization</div>
+      <div class="resource-desc">All repositories — Rusk, Piecrust, Kadcast, PLONK</div>
+      <div class="resource-url">github.com/dusk-network</div>
+    </a>
+    <a href="https://github.com/dusk-network/rusk" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">🦀</div>
+      <div class="resource-title">Rusk Node</div>
+      <div class="resource-desc">Full node implementation — consensus, VM, wallet, prover</div>
+      <div class="resource-url">github.com/dusk-network/rusk</div>
+    </a>
+    <a href="https://github.com/dusk-network/piecrust" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">⚡</div>
+      <div class="resource-title">Piecrust VM</div>
+      <div class="resource-desc">ZK-friendly WASM virtual machine for DuskVM contracts</div>
+      <div class="resource-url">github.com/dusk-network/piecrust</div>
+    </a>
+    <a href="https://explorer.dusk.network" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">🔍</div>
+      <div class="resource-title">Block Explorer</div>
+      <div class="resource-desc">DuskDS mainnet explorer — blocks, transactions, validators</div>
+      <div class="resource-url">explorer.dusk.network</div>
+    </a>
+    <a href="https://explorer.evm.dusk.network/" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">🔎</div>
+      <div class="resource-title">EVM Explorer</div>
+      <div class="resource-desc">DuskEVM Blockscout explorer — EVM contracts &amp; transactions</div>
+      <div class="resource-url">explorer.evm.dusk.network</div>
+    </a>
+    <a href="https://dusk.network/news/multilayer-evolution" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">🔗</div>
+      <div class="resource-title">Multilayer Architecture</div>
+      <div class="resource-desc">Announcement: DuskDS + DuskEVM + DuskVM three-layer design</div>
+      <div class="resource-url">dusk.network/news/multilayer-evolution</div>
+    </a>
+    <a href="https://github.com/dusk-network/node-installer" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">🛠</div>
+      <div class="resource-title">Node Installer</div>
+      <div class="resource-desc">Official one-liner node installer for provisioner setup</div>
+      <div class="resource-url">github.com/dusk-network/node-installer</div>
+    </a>
+    <a href="https://docs.dusk.network/learn/tokenomics/" target="_blank" rel="noopener noreferrer" class="resource-card">
+      <div class="resource-icon">💰</div>
+      <div class="resource-title">Tokenomics</div>
+      <div class="resource-desc">DUSK supply, emission schedule, staking rewards model</div>
+      <div class="resource-url">docs.dusk.network/learn/tokenomics</div>
+    </a>
+  </div>
+
+  <div style="margin-top:2rem;padding:1.25rem;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius);font-size:0.78rem;color:var(--text-dim)">
+    Built with data from <a href="https://docs.dusk.network" target="_blank" rel="noopener noreferrer">docs.dusk.network</a>, <a href="https://github.com/dusk-network" target="_blank" rel="noopener noreferrer">github.com/dusk-network</a>, and <a href="https://dusk.network" target="_blank" rel="noopener noreferrer">dusk.network</a>. Not an official Dusk Foundation publication. Research date: March 2026.
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- ── Search Modal ── -->
+<div id="search-overlay" role="dialog" aria-modal="true" aria-label="Search">
+  <div id="search-modal">
+    <input type="text" id="search-input" placeholder="Search sections, commands, concepts…" autocomplete="off" spellcheck="false">
+    <div id="search-results"></div>
+    <div class="search-footer">
+      <span><kbd>↵</kbd> to navigate</span>
+      <span><kbd>esc</kbd> to close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+(function() {
+'use strict';
+
+/* ── Search Data ── */
+const SEARCH_DATA = [
+  { title: 'Overview & Hero', section: 'Overview', href: '#hero', keywords: 'dusk network blockchain overview privacy rwa real world assets layer 1' },
+  { title: 'Protocol Architecture', section: 'Architecture', href: '#architecture', keywords: 'duskds duskevm duskvm modular stack layers bridge architecture piecrust' },
+  { title: 'Succinct Attestation Consensus', section: 'Consensus', href: '#consensus', keywords: 'consensus succinct attestation proposal validation ratification deterministic sortition stake committee finality epochs slashing' },
+  { title: 'Phoenix — Private UTXO', section: 'Transactions', href: '#transactions', keywords: 'phoenix private utxo notes nullifiers zk proofs sender receiver amount hidden' },
+  { title: 'Moonlight — Transparent Accounts', section: 'Transactions', href: '#transactions', keywords: 'moonlight transparent account balance exchange compliance moonlight' },
+  { title: 'Shield / Unshield Conversion', section: 'Transactions', href: '#transactions', keywords: 'shield unshield convert phoenix moonlight transfer contract atomic' },
+  { title: 'Kadcast P2P Network', section: 'Kadcast', href: '#kadcast', keywords: 'kadcast p2p networking kademlia udp broadcast log n gossip fec raptor' },
+  { title: 'DuskEVM Setup & Config', section: 'DuskEVM', href: '#duskevm', keywords: 'duskevm evm solidity metamask hardhat foundry chain id 744 745 op stack rpc' },
+  { title: 'Gas & Fee Structure', section: 'DuskEVM', href: '#duskevm', keywords: 'gas fee l1 l2 eip-1559 da blob dusk fee model' },
+  { title: 'Economic Protocol', section: 'Economic Protocol', href: '#economic', keywords: 'economic protocol autocontracts gas fees block reward treasury tokenomics 500m supply halving' },
+  { title: 'Dusk vs Ethereum Comparison', section: 'Comparison', href: '#comparison', keywords: 'ethereum comparison stake 32 eth finality privacy mev compliance advantage rwa' },
+  { title: 'Node Setup — Standard', section: 'Node Setup', href: '#node-setup', keywords: 'node setup install rusk-wallet create export consensus keys start stake standard' },
+  { title: 'Node Setup — Separated Keys', section: 'Node Setup', href: '#node-setup', keywords: 'separated key owner wallet cold hot node security unstake separated' },
+  { title: 'Node Setup — USB Cold Storage', section: 'Node Setup', href: '#node-setup', keywords: 'usb cold storage luks encryption encrypted drive owner wallet airgapped hardware offline' },
+  { title: 'Staking Commands', section: 'Node Setup', href: '#node-setup', keywords: 'stake unstake withdraw stake-info maturity 1000 dusk minimum 4320 blocks 2 epochs' },
+  { title: 'Smart Contracts — DuskVM (Rust)', section: 'Smart Contracts', href: '#smart-contracts', keywords: 'smart contract rust wasm piecrust forge contract macro deploy duskvm privacy' },
+  { title: 'Smart Contracts — DuskEVM (Solidity)', section: 'Smart Contracts', href: '#smart-contracts', keywords: 'solidity erc20 erc721 openzeppelin hardhat foundry deploy duskevm' },
+  { title: 'rusk-wallet Commands', section: 'Wallet & Keys', href: '#wallet', keywords: 'rusk-wallet create restore balance transfer shield unshield stake export addresses history' },
+  { title: 'Key Hierarchy & Management', section: 'Wallet & Keys', href: '#wallet', keywords: 'mnemonic bls key pair consensus key owner key phoenix moonlight address' },
+  { title: 'Soft Slashing (Recoverable)', section: 'Maintenance', href: '#maintenance', keywords: 'soft slashing offline missed block warning 10% recoverable withdraw restake' },
+  { title: 'Hard Slashing (Burned)', section: 'Maintenance', href: '#maintenance', keywords: 'hard slashing double vote equivocation 20% burned invalid block never run two nodes' },
+  { title: 'Node Monitoring', section: 'Maintenance', href: '#maintenance', keywords: 'monitoring block height ruskquery tail logs block accepted status service rusk' },
+  { title: 'Sentry Node Architecture', section: 'Maintenance', href: '#maintenance', keywords: 'sentry node dos protection firewall private validator public peers' },
+  { title: 'Ecosystem Projects', section: 'Ecosystem', href: '#ecosystem', keywords: 'ecosystem community projects partners integrations npex stox 21x chainlink cordial' },
+  { title: 'NPEX — Regulated Exchange', section: 'Ecosystem', href: '#ecosystem', keywords: 'npex dutch stock exchange mtf tokenized securities europe regulated trading' },
+  { title: 'STOX Trading Platform', section: 'Ecosystem', href: '#ecosystem', keywords: 'stox trading platform duskevm regulated assets money market stocks bonds' },
+  { title: 'Hedger Privacy Engine', section: 'Ecosystem', href: '#ecosystem', keywords: 'hedger privacy engine homomorphic encryption zk proofs duskevm confidential transactions zedger' },
+  { title: 'Citadel SSI Protocol', section: 'Ecosystem', href: '#ecosystem', keywords: 'citadel ssi self sovereign identity kyc zero knowledge nft license moat' },
+  { title: 'EURQ Stablecoin (Quantoz)', section: 'Ecosystem', href: '#ecosystem', keywords: 'eurq usdq quantoz stablecoin mica compliant euro emt payments duskpay' },
+  { title: 'Chainlink Integration', section: 'Ecosystem', href: '#ecosystem', keywords: 'chainlink ccip datalink data streams oracle cross chain interoperability' },
+  { title: 'w3sper.js SDK', section: 'Ecosystem', href: '#ecosystem', keywords: 'w3sper sdk javascript typescript dapp development wallet core' },
+  { title: 'Thesan Development Fund', section: 'Ecosystem', href: '#ecosystem', keywords: 'thesan fund 15m dusk grants ecosystem development incentives' },
+  { title: 'Resources & Links', section: 'Resources', href: '#resources', keywords: 'docs github explorer discord community tokenomics piecrust kadcast' },
+];
+
+
+/* ── Ecosystem Grid ── */
+.eco-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+.eco-card {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.eco-card:hover { border-color: var(--border); background: rgba(26,26,46,0.8); transform: translateY(-1px); text-decoration: none; }
+.eco-card-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.15rem; }
+.eco-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.15rem 0.45rem; border-radius: 3px;
+  background: var(--purple-faint); color: var(--purple-light);
+}
+.eco-badge.green { background: rgba(16,185,129,0.12); color: var(--green); }
+.eco-badge.yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+.eco-card-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.eco-card-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+.eco-card-url { font-size: 0.65rem; color: var(--text-dim); font-family: var(--font-mono); margin-top: auto; padding-top: 0.25rem; }
+.eco-category { margin-top: 1.5rem; }
+.eco-category-label {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--purple-light); margin-bottom: 0.75rem; padding-left: 0.25rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.eco-category-label::after { content: ''; flex: 1; height: 1px; background: var(--border-subtle); }
+@media (max-width: 768px) {
+  .eco-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .eco-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Search Modal ── */
+const overlay = document.getElementById('search-overlay');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+function openSearch() {
+  overlay.classList.add('open');
+  searchInput.value = '';
+  renderResults('');
+  setTimeout(() => searchInput.focus(), 50);
+}
+
+function closeSearch() {
+  overlay.classList.remove('open');
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+  return text.replace(re, '<mark class="sr-match">$1</mark>');
+}
+
+function renderResults(query) {
+  const q = query.toLowerCase().trim();
+  const matches = q
+    ? SEARCH_DATA.filter(d => d.title.toLowerCase().includes(q) || d.keywords.includes(q) || d.section.toLowerCase().includes(q))
+    : SEARCH_DATA;
+
+  if (matches.length === 0) {
+    searchResults.innerHTML = '<div class="search-empty">No results for "' + query + '"</div>';
+    return;
+  }
+
+  searchResults.innerHTML = matches.slice(0, 10).map(d => `
+    <a class="search-result" href="${d.href}">
+      <div class="sr-title">${highlight(d.title, query)}</div>
+      <div class="sr-section">${d.section}</div>
+    </a>
+  `).join('');
+
+  searchResults.querySelectorAll('.search-result').forEach(el => {
+    el.addEventListener('click', closeSearch);
+  });
+}
+
+document.getElementById('open-search').addEventListener('click', openSearch);
+document.getElementById('mobile-search').addEventListener('click', openSearch);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
+searchInput.addEventListener('input', e => renderResults(e.target.value));
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+
+/* ── Sidebar Navigation Active State (IntersectionObserver) ── */
+const navLinks = document.querySelectorAll('.nav-link[data-section]');
+const sections = document.querySelectorAll('.section[id]');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.dataset.section === id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+sections.forEach(s => observer.observe(s));
+
+/* ── Sections visible by default (no IntersectionObserver reveal needed) ── */
+
+/* ── Copy to Clipboard ── */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const wrap = btn.closest('.code-block-wrap');
+    const code = wrap ? wrap.querySelector('code') : null;
+    if (!code) return;
+    navigator.clipboard.writeText(code.textContent).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  });
+});
+
+/* ── Mobile Hamburger ── */
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('open');
+});
+
+sidebarOverlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('open');
+});
+
+sidebar.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    sidebarOverlay.classList.remove('open');
+  });
+});
+
+/* ── Live Prices (CoinGecko) ── */
+(function fetchPrices() {
+  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,dusk-network&vs_currencies=usd';
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      const eth = data.ethereum && data.ethereum.usd;
+      const dusk = data['dusk-network'] && data['dusk-network'].usd;
+      const fmt = (v) => v >= 1000 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '$' + v.toFixed(2);
+      if (eth) {
+        const eth32 = fmt(eth * 32);
+        const el1 = document.getElementById('svg-eth-price');
+        const el2 = document.getElementById('table-eth-price');
+        if (el1) el1.textContent = eth32;
+        if (el2) el2.textContent = eth32;
+      }
+      if (dusk) {
+        const dusk1k = fmt(dusk * 1000);
+        const el1 = document.getElementById('svg-dusk-price');
+        const el2 = document.getElementById('table-dusk-price');
+        const el3 = document.getElementById('card-stake-text');
+        if (el1) el1.textContent = dusk1k;
+        if (el2) el2.textContent = '~' + dusk1k;
+        if (el3 && eth) el3.textContent = '1,000 DUSK (' + dusk1k + ') vs 32 ETH (' + fmt(eth * 32) + ').';
+      }
+    })
+    .catch(() => { /* silent fail — fallback text stays */ });
+})();
+
+})();
+</script>
+</body>
+</html>
