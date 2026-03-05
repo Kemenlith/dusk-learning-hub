@@ -175,9 +175,15 @@ code { font-family: var(--font-mono); font-size: 0.85em; }
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.75rem;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+#hamburger svg { display: inline-block; flex-shrink: 0; }
 #mobile-logo { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 
 /* ── Main Content ── */
@@ -2820,30 +2826,45 @@ sidebar.querySelectorAll('.nav-link').forEach(link => {
 /* ── Live Prices (CoinGecko) ── */
 (function fetchPrices() {
   const url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,dusk-network&vs_currencies=usd';
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      const eth = data.ethereum && data.ethereum.usd;
-      const dusk = data['dusk-network'] && data['dusk-network'].usd;
-      const fmt = (v) => v >= 1000 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '$' + v.toFixed(2);
-      if (eth) {
-        const eth32 = fmt(eth * 32);
-        const el1 = document.getElementById('svg-eth-price');
-        const el2 = document.getElementById('table-eth-price');
-        if (el1) el1.textContent = eth32;
-        if (el2) el2.textContent = eth32;
-      }
-      if (dusk) {
-        const dusk1k = fmt(dusk * 1000);
-        const el1 = document.getElementById('svg-dusk-price');
-        const el2 = document.getElementById('table-dusk-price');
-        const el3 = document.getElementById('card-stake-text');
-        if (el1) el1.textContent = dusk1k;
-        if (el2) el2.textContent = '~' + dusk1k;
-        if (el3 && eth) el3.textContent = '1,000 DUSK (' + dusk1k + ') vs 32 ETH (' + fmt(eth * 32) + ').';
-      }
-    })
-    .catch(() => { /* silent fail — fallback text stays */ });
+  const fmt = (v) => v >= 1000 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '$' + v.toFixed(2);
+
+  function updatePrices(data) {
+    const eth = data.ethereum && data.ethereum.usd;
+    const dusk = data['dusk-network'] && data['dusk-network'].usd;
+    if (eth) {
+      const eth32 = fmt(eth * 32);
+      const el1 = document.getElementById('svg-eth-price');
+      const el2 = document.getElementById('table-eth-price');
+      if (el1) el1.textContent = eth32;
+      if (el2) el2.textContent = eth32;
+    }
+    if (dusk) {
+      const dusk1k = fmt(dusk * 1000);
+      const el1 = document.getElementById('svg-dusk-price');
+      const el2 = document.getElementById('table-dusk-price');
+      const el3 = document.getElementById('card-stake-text');
+      if (el1) el1.textContent = dusk1k;
+      if (el2) el2.textContent = '~' + dusk1k;
+      if (el3 && eth) el3.textContent = '1,000 DUSK (' + dusk1k + ') vs 32 ETH (' + fmt(data.ethereum.usd * 32) + ').';
+    }
+  }
+
+  function tryFetch(attempt) {
+    fetch(url)
+      .then(function(r) {
+        if (r.status === 429) {
+          if (attempt < 3) setTimeout(function() { tryFetch(attempt + 1); }, 3000 * attempt);
+          return null;
+        }
+        return r.json();
+      })
+      .then(function(data) { if (data) updatePrices(data); })
+      .catch(function() {
+        if (attempt < 3) setTimeout(function() { tryFetch(attempt + 1); }, 3000 * attempt);
+      });
+  }
+
+  tryFetch(1);
 })();
 
 })();
