@@ -1565,7 +1565,7 @@ strong { color: var(--text); font-weight: 600; }
       <text x="190" y="48" fill="#93c5fd" font-family="Inter,sans-serif" font-size="15" font-weight="700" text-anchor="middle">Ξ Ethereum</text>
       <text x="190" y="65" fill="#64748b" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">General Purpose Layer 1</text>
       <line x1="50" y1="75" x2="330" y2="75" stroke="rgba(59,130,246,0.15)" stroke-width="1"/>
-      <text x="50" y="94" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Stake: 32 ETH ≈ <tspan id="svg-eth-price">loading...</tspan></text>
+      <text x="50" y="94" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Stake: 32 ETH</text>
       <text x="50" y="112" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Finality: ~16 minutes</text>
       <text x="50" y="130" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">Privacy: roadmap (Phase 1–5)</text>
       <text x="50" y="148" fill="#94a3b8" font-family="Inter,sans-serif" font-size="10">ZK: L2 rollups only</text>
@@ -1579,7 +1579,7 @@ strong { color: var(--text); font-weight: 600; }
       <text x="570" y="48" fill="#a78bfa" font-family="Inter,sans-serif" font-size="15" font-weight="700" text-anchor="middle">◈ Dusk Network</text>
       <text x="570" y="65" fill="#64748b" font-family="Inter,sans-serif" font-size="10" text-anchor="middle">Regulated Finance Layer 1</text>
       <line x1="430" y1="75" x2="710" y2="75" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
-      <text x="430" y="94" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Stake: 1,000 DUSK ≈ <tspan id="svg-dusk-price">loading...</tspan></text>
+      <text x="430" y="94" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Stake: 1,000 DUSK</text>
       <text x="430" y="112" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Finality: faster, deterministic</text>
       <text x="430" y="130" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">Privacy: native (Phoenix ZK + Moonlight)</text>
       <text x="430" y="148" fill="#c4b5fd" font-family="Inter,sans-serif" font-size="10" font-weight="500">ZK: protocol-level PLONK</text>
@@ -1612,8 +1612,8 @@ strong { color: var(--text); font-weight: 600; }
       </tr>
       <tr>
         <td><strong>Min Stake</strong></td>
-        <td class="compare-eth">32 ETH (<span id="table-eth-price">~$96,000+</span>)</td>
-        <td class="dusk-cell">1,000 DUSK (<span id="table-dusk-price">~$30</span>)</td>
+        <td class="compare-eth">32 ETH</td>
+        <td class="dusk-cell">1,000 DUSK</td>
       </tr>
       <tr>
         <td><strong>Block Time</strong></td>
@@ -1683,7 +1683,7 @@ strong { color: var(--text); font-weight: 600; }
     <div class="adv-card">
       <div class="adv-icon">🌱</div>
       <div class="adv-title">Accessible Staking</div>
-      <div class="adv-desc"><span id="card-stake-text">1,000 DUSK vs 32 ETH.</span> A dramatically lower barrier means more validators, better decentralization.</div>
+      <div class="adv-desc">1,000 DUSK vs 32 ETH. A dramatically lower barrier means more validators, better decentralization.</div>
     </div>
     <div class="adv-card">
       <div class="adv-icon">⚡</div>
@@ -2830,59 +2830,6 @@ sidebar.querySelectorAll('.nav-link').forEach(link => {
     sidebarOverlay.classList.remove('open');
   });
 });
-
-/* ── Live Prices (CoinGecko) ── */
-(function fetchPrices() {
-  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,dusk-network&vs_currencies=usd';
-  const fmt = (v) => v >= 1000 ? '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '$' + v.toFixed(2);
-
-  function updatePrices(data) {
-    const eth = data.ethereum && data.ethereum.usd;
-    const dusk = data['dusk-network'] && data['dusk-network'].usd;
-    if (eth) {
-      const eth32 = fmt(eth * 32);
-      const el1 = document.getElementById('svg-eth-price');
-      const el2 = document.getElementById('table-eth-price');
-      if (el1) el1.textContent = eth32;
-      if (el2) el2.textContent = eth32;
-    }
-    if (dusk) {
-      const dusk1k = fmt(dusk * 1000);
-      const el1 = document.getElementById('svg-dusk-price');
-      const el2 = document.getElementById('table-dusk-price');
-      const el3 = document.getElementById('card-stake-text');
-      if (el1) el1.textContent = dusk1k;
-      if (el2) el2.textContent = '~' + dusk1k;
-      if (el3 && eth) el3.textContent = '1,000 DUSK (' + dusk1k + ') vs 32 ETH (' + fmt(data.ethereum.usd * 32) + ').';
-    }
-  }
-
-  function showFallback() {
-    var el1 = document.getElementById('svg-eth-price');
-    var el2 = document.getElementById('svg-dusk-price');
-    if (el1 && el1.textContent === 'loading...') el1.textContent = 'N/A';
-    if (el2 && el2.textContent === 'loading...') el2.textContent = 'N/A';
-  }
-
-  function tryFetch(attempt) {
-    fetch(url)
-      .then(function(r) {
-        if (r.status === 429) {
-          if (attempt < 3) { setTimeout(function() { tryFetch(attempt + 1); }, 3000 * attempt); }
-          else { showFallback(); }
-          return null;
-        }
-        return r.json();
-      })
-      .then(function(data) { if (data) updatePrices(data); })
-      .catch(function() {
-        if (attempt < 3) { setTimeout(function() { tryFetch(attempt + 1); }, 3000 * attempt); }
-        else { showFallback(); }
-      });
-  }
-
-  tryFetch(1);
-})();
 
 })();
 </script>
